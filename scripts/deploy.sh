@@ -2,7 +2,7 @@
 # Variables
 REPOSITORY_NAME="gonzalez-bot"
 ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
-TAG=$(date +%Y-%m-%d|%H:%M:%S) # Unique tag for each build
+TAG=$(date +%Y%m%d%H%M%S) # Unique tag for each build
 
 # Check if the repository exists; if not, create it
 REPO_CHECK=$(aws ecr describe-repositories --repository-names $REPOSITORY_NAME --region $AWS_REGION 2>/dev/null)
