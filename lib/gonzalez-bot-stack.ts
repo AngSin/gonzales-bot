@@ -34,7 +34,7 @@ export class GonzalezBotStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry(getMandatoryEnvVariable("IMAGE_URI")),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'GonzalezBot' }),
       environment: {
-        Gonzalez_TOKEN: '<your-Gonzalez-bot-token>',
+        TELEGRAM_BOT_TOKEN: getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN"),
       },
     });
 

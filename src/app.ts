@@ -1,11 +1,8 @@
 import {Bot, Context} from "grammy";
-import {config} from "dotenv";
 import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvValue";
 import {getAddressFromMessage, getTickerFromMessage} from "./utils/string";
 import {searchAndRetrievePair} from "./utils/api";
 import {replyToMessageWithPairInfo} from "./utils/messaging";
-
-config();
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
 
