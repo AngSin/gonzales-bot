@@ -15,7 +15,7 @@ else
 fi
 
 echo "Building Docker image..."
-docker buildx build --platform linux/amd64,linux/arm64 -t $REPOSITORY_NAME:$TAG --push .
+docker build -t $REPOSITORY_NAME .
 
 echo "Authenticating Docker to ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URI
