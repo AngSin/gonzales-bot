@@ -44,6 +44,7 @@ export class GonzalezBotStack extends cdk.Stack {
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'GonzalezBot' }),
       environment: {
         TELEGRAM_BOT_TOKEN: getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN"),
+        SOLANA_RPC_URL: getMandatoryEnvVariable("SOLANA_RPC_URL"),
         ETH_KEYS_TABLE: ethKeysTable.tableName,
         SOL_KEYS_TABLE: solKeysTable.tableName,
       },
