@@ -31,4 +31,4 @@ IMAGE_URI="$ECR_URI/$REPOSITORY_NAME:$TAG"
 echo "Image successfully pushed to ECR: $IMAGE_URI"
 
 # Pass the IMAGE_URI as an environment variable to the CDK deploy command
-IMAGE_URI=$IMAGE_URI npx cdk deploy --region $AWS_REGION --require-approval never
+IMAGE_URI=$IMAGE_URI npx cdk deploy --all --region $AWS_REGION --require-approval never
