@@ -1,8 +1,9 @@
 import {Pair} from "./types";
-import {Context} from "grammy";
+import {Context, InlineKeyboard} from "grammy";
 import {capitalize} from "./string";
 
 export const replyToMessageWithPairInfo = async (context: Context, pair: Pair) => {
+    const inlineKeyboard = new InlineKeyboard().text('BUY');
     await context.reply(
         `✍️ ${pair.baseToken.name}\n` +
         `🌐${capitalize(pair.chainId)}\n` +
@@ -11,7 +12,8 @@ export const replyToMessageWithPairInfo = async (context: Context, pair: Pair) =
         `💎$${pair.fdv.toLocaleString()} FDV \n` +
         `📜\`${pair.baseToken.address}\`\n`,
         {
-            parse_mode: "Markdown",
+            parse_mode: "HTML",
+            reply_markup: inlineKeyboard,
             reply_to_message_id: context.message?.message_id,
         }
     );
