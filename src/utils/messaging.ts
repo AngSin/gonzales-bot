@@ -10,7 +10,7 @@ export const replyToMessageWithPairInfo = async (context: Context, pair: Pair) =
         `💹$${pair.baseToken.symbol}\n\n` +
         `💰$${pair.priceUsd.toLocaleString()}\n` +
         `💎$${pair.fdv.toLocaleString()} FDV \n` +
-        `📜\`${pair.baseToken.address}\`\n`,
+        `<a href="tg://copy?text=${pair.baseToken.address}">${pair.baseToken.address}</a>\n`,
         {
             parse_mode: "HTML",
             reply_markup: inlineKeyboard,
