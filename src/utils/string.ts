@@ -11,13 +11,15 @@ const isSolanaAddress = (address:string) => {
     }
 }
 
+const splitBySpaceOrSlash = /[\s\/]+/;
+
 export const getTickerFromMessage = (message: Message): string | undefined => {
-    const words = (message.text || '').split(' ');
+    const words = (message.text || '').split(splitBySpaceOrSlash);
     return words.find(word => word.length > 2 && word.startsWith('$'))?.replace('$', '');
 };
 
 export const getAddressFromMessage = (message: Message): string | undefined => {
-    const words = (message.text || '').split(' ');
+    const words = (message.text || '').split(splitBySpaceOrSlash);
     return words.find(word => isEthereumAddress(word) || isSolanaAddress(word));
 };
 
