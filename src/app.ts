@@ -1,10 +1,12 @@
 import {Bot, Context} from "grammy";
-import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvValue";
+import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import {getAddressFromMessage, getTickerFromMessage} from "./utils/string";
 import {searchAndRetrievePair} from "./utils/api";
 import {replyToMessageWithPairInfo} from "./utils/messaging";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
+
+console.log('ETH and SOL Tables:', process.env.ETH_KEYS_TABLE, process.env.SOL_KEYS_TABLE);
 
 const bot = new Bot(botToken);
 

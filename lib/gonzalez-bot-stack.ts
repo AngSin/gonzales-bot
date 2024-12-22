@@ -3,11 +3,18 @@ import { Construct } from 'constructs';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { getMandatoryEnvVariable } from "../src/utils/getMandatoryEnvValue";
+import { getMandatoryEnvVariable } from "../src/utils/getMandatoryEnvVariable";
+import {Table} from "aws-cdk-lib/aws-dynamodb";
+
+interface GonzalezBotStackProps extends cdk.StackProps {
+  ethKeysTable: Table;
+  solKeysTable: Table;
+}
 
 export class GonzalezBotStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: GonzalezBotStackProps) {
     super(scope, id, props);
+    const { ethKeysTable, solKeysTable } = props;
 
     const vpc = new ec2.Vpc(this, 'GonzalezBotVpc', {
       maxAzs: 2, // Availability Zones
@@ -23,6 +30,8 @@ export class GonzalezBotStack extends cdk.Stack {
     });
 
     taskExecutionRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy'));
+    ethKeysTable.grantReadWriteData(taskExecutionRole);
+    solKeysTable.grantReadWriteData(taskExecutionRole);
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'GonzalezBotTask', {
       memoryLimitMiB: 512,
@@ -35,6 +44,8 @@ export class GonzalezBotStack extends cdk.Stack {
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'GonzalezBot' }),
       environment: {
         TELEGRAM_BOT_TOKEN: getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN"),
+        ETH_KEYS_TABLE: ethKeysTable.tableName,
+        SOL_KEYS_TABLE: solKeysTable.tableName,
       },
     });
 
