@@ -3,7 +3,7 @@ import {Context, InlineKeyboard} from "grammy";
 import {capitalize} from "./string";
 
 export const replyToMessageWithPairInfo = async (context: Context, pair: Pair) => {
-    const inlineKeyboard = new InlineKeyboard().text('BUY');
+    const inlineKeyboard = new InlineKeyboard().text('BUY', `buy:${pair.baseToken.address}`);
     await context.reply(
         `✍️ ${pair.baseToken.name}\n` +
         `🌐${capitalize(pair.chainId)}\n` +

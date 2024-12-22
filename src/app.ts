@@ -23,6 +23,23 @@ bot.on("message", async (context: Context) => {
     console.log(`Found token pair: ${JSON.stringify(pair)}\n`);
 
     await replyToMessageWithPairInfo(context, pair);
-})
+});
+
+bot.on("callback_query:data", async (context) => {
+    const callbackData = context.callbackQuery?.data;
+    console.log(`Received callback query: ${callbackData}`);
+
+    if (!callbackData || !callbackData.startsWith('buy:')) return;
+
+    const tokenAddress = callbackData.split(':')[1];
+
+    await context.answerCallbackQuery({ text: "Processing your BUY request..." });
+
+    await context.reply(
+        `🛒 You have selected to BUY the token with address: \`${tokenAddress}\``,
+        { parse_mode: "Markdown" }
+    );
+});
+
 
 bot.start();
