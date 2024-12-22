@@ -5,8 +5,8 @@ import {searchAndRetrievePair} from "./utils/api";
 import {replyToMessageWithPairInfo} from "./utils/messaging";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
-
-console.log('ETH and SOL Tables:', process.env.ETH_KEYS_TABLE, process.env.SOL_KEYS_TABLE);
+const ethTable = getMandatoryEnvVariable("ETH_KEYS_TABLE");
+const solTable = getMandatoryEnvVariable("SOL_KEYS_TABLE");
 
 const bot = new Bot(botToken);
 
@@ -29,7 +29,8 @@ bot.on("message", async (context: Context) => {
 
 bot.on("callback_query:data", async (context) => {
     const callbackData = context.callbackQuery?.data;
-    console.log(`Received callback query: ${callbackData}`);
+    const userId = context.from.id;
+    console.log(`Received callback query: ${callbackData} from user ${context.from.username} with user id ${userId}`);
 
     if (!callbackData || !callbackData.startsWith('buy:')) return;
 

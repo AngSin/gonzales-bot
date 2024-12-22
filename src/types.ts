@@ -73,3 +73,9 @@ type Social = {
     type: string;
     url: string;
 };
+
+export type Key ={
+    name: string;
+    privateKey: Uint8Array;
+    publicKey: string;
+}

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {DexScreenerSearchResponse, Pair} from "./types";
+import {DexScreenerSearchResponse, Pair} from "../types";
 
 const dexscreenerBaseUrl = "https://api.dexscreener.com/latest/dex/"
 
