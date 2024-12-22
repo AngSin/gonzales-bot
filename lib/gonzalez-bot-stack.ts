@@ -24,19 +24,25 @@ export class GonzalezBotStack extends cdk.Stack {
       vpc,
     });
 
-    // Create a task execution role with the required policies
     const taskExecutionRole = new iam.Role(this, 'GonzalezBotTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
     });
 
     taskExecutionRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy'));
-    ethKeysTable.grantReadWriteData(taskExecutionRole);
-    solKeysTable.grantReadWriteData(taskExecutionRole);
+
+    const taskRole = new iam.Role(this, 'GonzalezBotTaskRole', {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+    });
+
+    // Grant DynamoDB permissions to the task role
+    ethKeysTable.grantReadWriteData(taskRole);
+    solKeysTable.grantReadWriteData(taskRole);
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'GonzalezBotTask', {
       memoryLimitMiB: 512,
       cpu: 256,
-      executionRole: taskExecutionRole, // Attach the execution role
+      executionRole: taskExecutionRole,
+      taskRole,
     });
 
     taskDefinition.addContainer('GonzalezBotContainer', {
