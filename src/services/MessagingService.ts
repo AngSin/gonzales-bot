@@ -10,8 +10,8 @@ export class MessagingService {
         this.logger = new Logger({ serviceName: "MessagingService"});
     }
 
-    async replyToMessageWithPairInfo (context: Context, pair: Pair) {
-        const inlineKeyboard = new InlineKeyboard().text('BUY', `buy:${pair.baseToken.address}`);
+    async replyWithPairInfo (context: Context, pair: Pair) {
+        const inlineKeyboard = new InlineKeyboard().text('BUY', `buy:${pair.baseToken.address}:${pair.baseToken.symbol}`);
         const messageText = (`✍️ ${pair.baseToken.name}\n` +
             `🌐${capitalize(pair.chainId)}\n` +
             `💹$${pair.baseToken.symbol}\n\n` +
@@ -30,4 +30,17 @@ export class MessagingService {
             }
         );
     };
+
+    async replyWithNewSOLWallet(context: Context, pubKey: string) {
+        const messageText = (
+            `You do not have a Gonzalez Wallet for Solana yet. We created one for you. Send SOL to this address to be able to trade on Gonzalez: \n\n` +
+            `\`${pubKey}\n\``
+        );
+        await context.reply(
+            messageText,
+            {
+                parse_mode: "MarkdownV2",
+            }
+        );
+    }
 }

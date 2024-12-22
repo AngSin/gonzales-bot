@@ -3,13 +3,16 @@ import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import {getAddressFromMessage, getTickerFromMessage} from "./utils/string";
 import {searchAndRetrievePair} from "./utils/api";
 import {MessagingService} from "./services/MessagingService";
+import {SolanaKeyService} from "./services/SolanaKeyService";
+import {Logger} from "@aws-lambda-powertools/logger";
+import handleStart from "./handlers/handleStart";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
-const ethTable = getMandatoryEnvVariable("ETH_KEYS_TABLE");
-const solTable = getMandatoryEnvVariable("SOL_KEYS_TABLE");
 
+const logger = new Logger({ serviceName: "App" });
 const bot = new Bot(botToken);
 const messagingService = new MessagingService();
+const solanaKeyService = new SolanaKeyService();
 
 bot.on("message", async (context: Context) => {
     const { message } = context;
@@ -25,25 +28,28 @@ bot.on("message", async (context: Context) => {
     const pair = await searchAndRetrievePair(addressOrTicker);
     console.log(`Found token pair: ${JSON.stringify(pair)}\n`);
 
-    await messagingService.replyToMessageWithPairInfo(context, pair);
+    await messagingService.replyWithPairInfo(context, pair);
 });
 
 bot.on("callback_query:data", async (context) => {
     const callbackData = context.callbackQuery?.data;
-    const userId = context.from.id;
+    const userId = context.from?.id.toString();
     console.log(`Received callback query: ${callbackData} from user ${context.from.username} with user id ${userId}`);
 
-    if (!callbackData || !callbackData.startsWith('buy:')) return;
+    const [direction, tokenAddress, ticker] = callbackData.split(':');
 
-    const tokenAddress = callbackData.split(':')[1];
+    if (!direction || !callbackData.startsWith('buy:')) return;
 
-    await context.answerCallbackQuery({ text: "Processing your BUY request..." });
+    const solanaKey = await solanaKeyService.getKey(userId);
 
-    await context.reply(
-        `🛒 You have selected to BUY the token with address: \`${tokenAddress}\``,
-        { parse_mode: "Markdown" }
-    );
+    await context.answerCallbackQuery({ text: `${context.from.first_name} is buying ${ticker}` });
+
+    if (!solanaKey) {
+        logger.info(`No solanaKey exists for user ${userId}`);
+        // TODO: tell user to create wallet with Gonzalez
+    }
 });
 
+bot.command("start", handleStart);
 
 bot.start();
