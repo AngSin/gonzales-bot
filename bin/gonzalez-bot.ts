@@ -23,4 +23,6 @@ const databaseStack = new DatabaseStack(app, 'keysData');
 
 new GonzalezBotStack(app, 'GonzalezBotStack', {
     env,
+    ethKeysTable: databaseStack.ethKeysTable,
+    solKeysTable: databaseStack.solKeysTable,
 });
