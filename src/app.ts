@@ -2,13 +2,14 @@ import {Bot, Context} from "grammy";
 import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import {getAddressFromMessage, getTickerFromMessage} from "./utils/string";
 import {searchAndRetrievePair} from "./utils/api";
-import {replyToMessageWithPairInfo} from "./utils/messaging";
+import {MessagingService} from "./services/MessagingService";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
 const ethTable = getMandatoryEnvVariable("ETH_KEYS_TABLE");
 const solTable = getMandatoryEnvVariable("SOL_KEYS_TABLE");
 
 const bot = new Bot(botToken);
+const messagingService = new MessagingService();
 
 bot.on("message", async (context: Context) => {
     const { message } = context;
@@ -24,7 +25,7 @@ bot.on("message", async (context: Context) => {
     const pair = await searchAndRetrievePair(addressOrTicker);
     console.log(`Found token pair: ${JSON.stringify(pair)}\n`);
 
-    await replyToMessageWithPairInfo(context, pair);
+    await messagingService.replyToMessageWithPairInfo(context, pair);
 });
 
 bot.on("callback_query:data", async (context) => {
