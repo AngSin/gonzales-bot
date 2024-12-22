@@ -14,6 +14,8 @@ const bot = new Bot(botToken);
 const messagingService = new MessagingService();
 const solanaKeyService = new SolanaKeyService();
 
+bot.command("start", handleStart);
+
 bot.on("message", async (context: Context) => {
     const { message } = context;
     console.log(`Received message: ${JSON.stringify(message)}\n`);
@@ -49,7 +51,5 @@ bot.on("callback_query:data", async (context) => {
         // TODO: tell user to create wallet with Gonzalez
     }
 });
-
-bot.command("start", handleStart);
 
 bot.start();
