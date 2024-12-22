@@ -12,6 +12,7 @@ export const replyToMessageWithPairInfo = async (context: Context, pair: Pair) =
         `📜\`${pair.baseToken.address}\`\n`,
         {
             parse_mode: "Markdown",
+            reply_to_message_id: context.message?.message_id,
         }
     );
 };
