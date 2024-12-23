@@ -7,11 +7,11 @@ import SolanaService from "../services/SolanaService";
 const logger = new Logger({ serviceName: 'handleBuy' });
 
 const handleBuy = async (context: Context, assetAddress: string, userId: string, symbol: string, amountInSOL: string) => {
-    // await context.answerCallbackQuery({ text: `${context.from?.first_name} is buying ${symbol}...`, cache_time: 1 });
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     const solanaService = new SolanaService();
 
+    await context.answerCallbackQuery({ text: `${context.from?.first_name} is buying ${symbol}...` });
     const solanaKey = await solanaKeyService.getKey(userId);
 
     if (solanaKey) {
