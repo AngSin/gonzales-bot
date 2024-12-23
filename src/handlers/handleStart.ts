@@ -30,14 +30,12 @@ const handleStart = async (context: Context) => {
         messageText = (
             `Welcome to Gonzalez Bot! Since this is your first time using Gonzalez, we have created a wallet for you\n\n` +
             `Deposit SOL into your account to get started: \`${solanaKey.publicKey}\` (tap to copy)\n\n` +
-            `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n` +
+            `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n\n` +
             `To buy a token, type its ticker symbol or CA into the chat`
         );
     }
     const inlineKeyboard = new InlineKeyboard()
         .text('Refresh', 'start')
-        .row()
-        .text('')
         .row()
         .text('Withdraw', 'withdraw')
         .row();
