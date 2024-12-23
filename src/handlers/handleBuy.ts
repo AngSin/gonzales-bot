@@ -17,6 +17,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
         const { amountBought } = await solanaService.buySolanaAsset(assetAddress, amountInSOL);
+        logger.info(`amount bought: ${amountBought} ${symbol}, chat is of type: ${context.chat?.type}`);
         if (context.chat?.type === 'private') {
             await messagingService.sendMessage(context, `You just bought ${amountBought} SOL!`);
         } else {
@@ -35,7 +36,6 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
             keyboard,
         );
     }
-
 };
 
 export default handleBuy;
