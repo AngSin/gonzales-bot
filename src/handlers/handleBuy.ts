@@ -12,7 +12,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
     const solanaService = new SolanaService();
     const solanaKey = await solanaKeyService.getKey(userId);
 
-    await context.answerCallbackQuery({ text: `${context.from?.first_name} is buying ${symbol}` });
+    await context.answerCallbackQuery({ text: `${context.from?.first_name} is buying ${symbol}...`, cache_time: 1 });
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
