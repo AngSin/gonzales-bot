@@ -2,12 +2,20 @@ import {Pair} from "../types";
 import {Context, InlineKeyboard} from "grammy";
 import {capitalize} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
-import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 
 export class MessagingService {
     readonly logger: Logger;
     constructor() {
         this.logger = new Logger({ serviceName: "MessagingService"});
+    }
+
+    private escapeTelegramMarkup(text: string): string {
+        const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+
+        return text.replace(
+            new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),
+            (match) => `\\${match}`
+        );
     }
 
     async replyWithPairInfo (context: Context, pair: Pair) {
@@ -17,12 +25,12 @@ export class MessagingService {
             `💹$${pair.baseToken.symbol}\n\n` +
             `💰$${pair.priceUsd.toLocaleString()}\n` +
             `💎$${pair.fdv.toLocaleString()} FDV \n` +
-            `\`${pair.baseToken.address}\`\n`).replace(/\./g, '\\.'); // Telegram MarkdownV2 text doesn't allow "."
+            `\`${pair.baseToken.address}\`\n`); // Telegram MarkdownV2 text doesn't allow "."
 
         this.logger.info(`Replying to message with: ${messageText}`);
 
         await context.reply(
-            messageText,
+            this.escapeTelegramMarkup(messageText),
             {
                 parse_mode: "MarkdownV2",
                 reply_markup: inlineKeyboard,
@@ -37,9 +45,19 @@ export class MessagingService {
             `\`${pubKey}\n\``
         );
         await context.reply(
-            messageText,
+            this.escapeTelegramMarkup(messageText),
             {
                 parse_mode: "MarkdownV2",
+            }
+        );
+    }
+
+    async replyWithKeyboard(context: Context, messageText: string, inlineKeyboard: InlineKeyboard) {
+        await context.reply(
+            this.escapeTelegramMarkup(messageText),
+            {
+                parse_mode: "MarkdownV2",
+                reply_markup: inlineKeyboard,
             }
         );
     }

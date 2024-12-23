@@ -1,6 +1,6 @@
 import {isAddress as isEthereumAddress} from "viem";
 import {PublicKey} from "@solana/web3.js";
-import { Message } from "grammy/types";
+import {Message} from "grammy/types";
 
 const isSolanaAddress = (address:string) => {
     try {
