@@ -19,7 +19,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
         const { amountBought } = await solanaService.buySolanaAsset(assetAddress, amountInSOL);
         logger.info(`amount bought: ${amountBought} ${symbol}, chat is of type: ${context.chat?.type}`);
         if (context.chat?.type === 'private') {
-            await messagingService.sendMessage(context, `You just bought ${amountBought} SOL!`);
+            await messagingService.sendMessage(context, `You just bought ${amountBought} ${symbol}!`);
         } else {
             await messagingService.sendMessage(context, `${context.from?.first_name} just bought some ${assetAddress}!`); // we do not want to reveal the purchased amount in a group chat
         }
