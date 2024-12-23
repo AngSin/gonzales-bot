@@ -16,7 +16,7 @@ const handleStart = async (context: Context) => {
     const solanaService = new SolanaService();
     let messageText: string;
     if (solanaKey) {
-        const balance = await solanaService.getHumanFriendlyBalance(solanaKey.publicKey)
+        const balance = await solanaService.getHumanFriendlySOLBalance(solanaKey.publicKey)
         messageText = (
             `Welcome back to Gonzalez Bot! You previously created a wallet which currently has ${balance} SOL\n\n` +
             `You may deposit more SOL into your account: \`${solanaKey.publicKey}\` (tap to copy)\n\n` +
@@ -39,7 +39,7 @@ const handleStart = async (context: Context) => {
         .row()
         .text('Withdraw', 'withdraw')
         .row();
-    await messagingService.replyWithKeyboard(
+    await messagingService.sendMessage(
         context,
         messageText,
         inlineKeyboard

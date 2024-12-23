@@ -58,7 +58,7 @@ export class MessagingService {
         );
     };
 
-    async replyWithKeyboard(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
+    async sendMessage(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await context.reply(
             this.escapeTelegramMarkup(messageText),
             {

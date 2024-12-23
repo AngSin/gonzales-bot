@@ -6,7 +6,7 @@ import SolanaService from "../services/SolanaService";
 
 const logger = new Logger({ serviceName: 'handleBuy' });
 
-const handleBuy = async (context: Context, address: string, userId: string, symbol: string, amountInSOL: string) => {
+const handleBuy = async (context: Context, assetAddress: string, userId: string, symbol: string, amountInSOL: string) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     const solanaService = new SolanaService();
@@ -16,7 +16,12 @@ const handleBuy = async (context: Context, address: string, userId: string, symb
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
-        await solanaService.buySolanaAsset(address, amountInSOL);
+        const { amountBought } = await solanaService.buySolanaAsset(assetAddress, amountInSOL);
+        if (context.chat?.type === 'private') {
+            await messagingService.sendMessage(context, `You just bought ${amountBought} SOL!`);
+        } else {
+            await messagingService.sendMessage(context, `${context.from?.first_name} just bought some ${assetAddress}!`); // we do not want to reveal the purchased amount in a group chat
+        }
     } else {
         logger.info(`No solanaKey exists for user ${userId}`);
         const botUsername = context.me.username;
@@ -24,7 +29,7 @@ const handleBuy = async (context: Context, address: string, userId: string, symb
             "Set up wallet",
             `https://t.me/${botUsername}`
         );
-        await messagingService.replyWithKeyboard(
+        await messagingService.sendMessage(
             context,
             `${context.from?.first_name}, you do not have a Gonzalez wallet. DM me to get started`,
             keyboard,
