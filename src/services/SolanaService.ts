@@ -51,6 +51,7 @@ export default class SolanaService {
     }
 
     async buySolanaAsset(assetAddress: string, amountInSOL: string): Promise<BuyResponse> {
+        this.logger.info(`Buying ${amountInSOL} SOL of ${assetAddress}`);
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
             params: {
