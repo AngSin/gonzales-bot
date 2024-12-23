@@ -25,7 +25,7 @@ type BuyResponse = {
 };
 
 export default class SolanaService {
-    readonly connection: Connection = new Connection(getMandatoryEnvVariable("SOLANA_RPC_URL"), 'processed');
+    readonly connection: Connection = new Connection(getMandatoryEnvVariable("SOLANA_RPC_URL"));
     readonly jupiterAxios: AxiosInstance = axios.create({
         baseURL: "https://quote-api.jup.ag/v6/",
     });
@@ -41,7 +41,7 @@ export default class SolanaService {
     }
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
-        const mintAccount = await getMint(this.connection, new PublicKey(tokenAddress), 'processed');
+        const mintAccount = await getMint(this.connection, new PublicKey(tokenAddress));
         this.logger.info(`Found mint address for token ${tokenAddress}`, { mintAccount });
         const decimals = mintAccount.decimals;
         return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
