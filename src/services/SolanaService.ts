@@ -46,7 +46,7 @@ export default class SolanaService {
         this.logger.info(`Token mint Pubkey: `, { tokenMintPubkey });
         this.logger.info(`Slot: ${await this.connection.getSlot()}`);
         const mintAccount = await getMint(this.connection, tokenMintPubkey);
-        this.logger.info(`Found mint address for token ${tokenAddress}`, { mintAccount });
+        this.logger.info(`Found mint address for token ${tokenAddress}`, { decimals: mintAccount.decimals });
         const decimals = mintAccount.decimals;
         return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
             minimumFractionDigits: 2,
