@@ -2,9 +2,8 @@ import {Connection, LAMPORTS_PER_SOL, PublicKey} from "@solana/web3.js";
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
-import {getMint} from "@solana/spl-token";
+import {getMint, NATIVE_MINT} from "@solana/spl-token";
 
-const WRAPPED_SOL_MINT_ADDRESS = 'So11111111111111111111111111111111111111112';
 
 type SwapMode = "ExactIn" | "ExactOut";
 
@@ -43,6 +42,7 @@ export default class SolanaService {
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
         const mintAccount = await getMint(this.connection, new PublicKey(tokenAddress), 'processed');
+        this.logger.info(`Found mint address for token ${tokenAddress}`, { mintAccount });
         const decimals = mintAccount.decimals;
         return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
             minimumFractionDigits: 2,
@@ -55,7 +55,7 @@ export default class SolanaService {
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
             params: {
-                inputMint: WRAPPED_SOL_MINT_ADDRESS,
+                inputMint: NATIVE_MINT,
                 outputMint: assetAddress,
                 amount: amountInLamports,
                 slippageBps: 1,
