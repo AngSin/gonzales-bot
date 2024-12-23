@@ -1,7 +1,7 @@
 import {Bot, Context} from "grammy";
 import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import {getAddressFromMessage, getTickerFromMessage} from "./utils/string";
-import {searchAndRetrievePair} from "./utils/api";
+import {searchAndRetrievePair} from "./services/api";
 import {MessagingService} from "./services/MessagingService";
 import {SolanaKeyService} from "./services/SolanaKeyService";
 import {Logger} from "@aws-lambda-powertools/logger";

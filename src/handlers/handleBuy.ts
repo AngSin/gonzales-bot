@@ -2,19 +2,21 @@ import {Context, InlineKeyboard} from "grammy";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {MessagingService} from "../services/MessagingService";
+import SolanaService from "../services/SolanaService";
 
 const logger = new Logger({ serviceName: 'handleBuy' });
 
 const handleBuy = async (context: Context, address: string, userId: string, symbol: string, amountInSOL: string) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
+    const solanaService = new SolanaService();
     const solanaKey = await solanaKeyService.getKey(userId);
 
     await context.answerCallbackQuery({ text: `${context.from?.first_name} is buying ${symbol}` });
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
-
+        await solanaService.buySolanaAsset(address, amountInSOL);
     } else {
         logger.info(`No solanaKey exists for user ${userId}`);
         const botUsername = context.me.username;
