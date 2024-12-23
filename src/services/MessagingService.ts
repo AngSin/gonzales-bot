@@ -2,7 +2,6 @@ import {Pair} from "../types";
 import {Context, InlineKeyboard} from "grammy";
 import {capitalize} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
-import type {InlineKeyboardButton} from "grammy/out/types";
 
 export class MessagingService {
     readonly logger: Logger;
