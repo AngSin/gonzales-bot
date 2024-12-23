@@ -6,6 +6,7 @@ import {MessagingService} from "./services/MessagingService";
 import {SolanaKeyService} from "./services/SolanaKeyService";
 import {Logger} from "@aws-lambda-powertools/logger";
 import handleStart from "./handlers/handleStart";
+import handleBuy from "./handlers/handleBuy";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
 
@@ -42,14 +43,7 @@ bot.on("callback_query:data", async (context) => {
 
     if (!direction || !callbackData.startsWith('buy:')) return;
 
-    const solanaKey = await solanaKeyService.getKey(userId);
-
-    await context.answerCallbackQuery({ text: `${context.from.first_name} is buying ${ticker}` });
-
-    if (!solanaKey) {
-        logger.info(`No solanaKey exists for user ${userId}`);
-        // TODO: tell user to create wallet with Gonzalez
-    }
+    await handleBuy(context, tokenAddress, userId, ticker, amountInSOL);
 });
 
 bot.start();

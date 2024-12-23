@@ -8,7 +8,7 @@ export class MessagingService {
     readonly logger: Logger;
     constructor() {
         this.logger = new Logger({ serviceName: "MessagingService"});
-    }
+    };
 
     private escapeTelegramMarkup(text: string): string {
         const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
@@ -17,7 +17,7 @@ export class MessagingService {
             new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),
             (match) => `\\${match}`
         );
-    }
+    };
 
     async replyWithPairInfo (context: Context, pair: Pair) {
         const amounts = ['0.1', '0.5', '1'];
@@ -56,15 +56,16 @@ export class MessagingService {
                 parse_mode: "MarkdownV2",
             }
         );
-    }
+    };
 
-    async replyWithKeyboard(context: Context, messageText: string, inlineKeyboard: InlineKeyboard) {
+    async replyWithKeyboard(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await context.reply(
             this.escapeTelegramMarkup(messageText),
             {
                 parse_mode: "MarkdownV2",
                 reply_markup: inlineKeyboard,
+                reply_to_message_id: isReply ? context.message?.message_id : undefined,
             }
         );
-    }
+    };
 }
