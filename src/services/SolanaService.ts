@@ -42,7 +42,10 @@ export default class SolanaService {
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
         this.logger.info(`Fetching mint account for ${tokenAddress}`);
-        const mintAccount = await getMint(this.connection, new PublicKey(tokenAddress));
+        const tokenMintPubkey = new PublicKey(tokenAddress);
+        this.logger.info(`Token mint Pubkey: `, { tokenMintPubkey });
+        this.logger.info(`Slot: ${await this.connection.getSlot()}`);
+        const mintAccount = await getMint(this.connection, tokenMintPubkey);
         this.logger.info(`Found mint address for token ${tokenAddress}`, { mintAccount });
         const decimals = mintAccount.decimals;
         return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
