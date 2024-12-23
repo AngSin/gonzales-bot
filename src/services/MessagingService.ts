@@ -2,6 +2,7 @@ import {Pair} from "../types";
 import {Context, InlineKeyboard} from "grammy";
 import {capitalize} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
+import type {InlineKeyboardButton} from "grammy/out/types";
 
 export class MessagingService {
     readonly logger: Logger;
@@ -19,7 +20,12 @@ export class MessagingService {
     }
 
     async replyWithPairInfo (context: Context, pair: Pair) {
-        const inlineKeyboard = new InlineKeyboard().text('BUY', `buy:${pair.baseToken.address}:${pair.baseToken.symbol}`);
+        const amounts = ['0.1', '0.5', '1'];
+        const inlineKeyboard = new InlineKeyboard();// .text('BUY', `buy:${pair.baseToken.address}:${pair.baseToken.symbol}`);
+        inlineKeyboard.add(...amounts.map(amount => ({
+            text: `BUY ${amount} SOL`,
+            callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol}:${amount}`,
+        })));
         const messageText = (`✍️ ${pair.baseToken.name}\n` +
             `🌐${capitalize(pair.chainId)}\n` +
             `💹$${pair.baseToken.symbol}\n\n` +

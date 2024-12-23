@@ -38,7 +38,7 @@ bot.on("callback_query:data", async (context) => {
     const userId = context.from?.id.toString();
     console.log(`Received callback query: ${callbackData} from user ${context.from.username} with user id ${userId}`);
 
-    const [direction, tokenAddress, ticker] = callbackData.split(':');
+    const [direction, tokenAddress, ticker, amountInSOL] = callbackData.split(':');
 
     if (!direction || !callbackData.startsWith('buy:')) return;
 
