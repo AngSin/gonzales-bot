@@ -63,9 +63,9 @@ export default class SolanaService {
             }
         });
         this.logger.info(`Received quotes response: `, { quoteResponse });
-        const amountBought = await this.getHumanFriendlyTokenBalance(quoteResponse.outputMint, quoteResponse.outAmount);
+        // const amountBought = await this.getHumanFriendlyTokenBalance(quoteResponse.outputMint, quoteResponse.outAmount);
         return {
-            amountBought
+            amountBought: quoteResponse.outAmount
         };
     }
 }
