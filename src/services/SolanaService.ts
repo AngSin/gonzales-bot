@@ -31,7 +31,7 @@ export default class SolanaService {
                 slippageBps: 1,
             }
         });
-        this.logger.info(JSON.stringify(quoteResponse));
-        return JSON.stringify(quoteResponse);
+        this.logger.info(`Received quotes response: `, { res: quoteResponse });
+        return '';
     }
 }
