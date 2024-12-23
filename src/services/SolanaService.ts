@@ -47,7 +47,7 @@ export default class SolanaService {
         return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-        });;
+        });
     }
 
     async buySolanaAsset(assetAddress: string, amountInSOL: string): Promise<BuyResponse> {
@@ -61,8 +61,8 @@ export default class SolanaService {
                 slippageBps: 1,
             }
         });
-        const amountBought = await this.getHumanFriendlyTokenBalance(quoteResponse.outputMint, quoteResponse.outAmount);
         this.logger.info(`Received quotes response: `, { quoteResponse });
+        const amountBought = await this.getHumanFriendlyTokenBalance(quoteResponse.outputMint, quoteResponse.outAmount);
         return {
             amountBought
         };
