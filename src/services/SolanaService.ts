@@ -1,9 +1,9 @@
-import {Connection, LAMPORTS_PER_SOL, PublicKey} from "@solana/web3.js";
+import {Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, VersionedTransaction} from "@solana/web3.js";
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {getMint, NATIVE_MINT} from "@solana/spl-token";
-
+import {Key} from "../types";
 
 type SwapMode = "ExactIn" | "ExactOut";
 
@@ -19,6 +19,9 @@ type JupiterQuotesResponse = {
     contextSlot: number; // Slot number for context
 };
 
+type JupiterSwapResponse = {
+    swapTransaction: string;
+}
 
 type BuyResponse = {
   amountBought: string;
@@ -41,25 +44,17 @@ export default class SolanaService {
     }
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
-        try {
-            this.logger.info(`Fetching mint account for ${tokenAddress}`);
-            const tokenMintPubkey = new PublicKey(tokenAddress);
-            this.logger.info(`Token mint Pubkey: `, { tokenMintPubkey });
-            this.logger.info(`Slot: ${await this.connection.getSlot()}`);
-            const mintAccount = await getMint(this.connection, tokenMintPubkey);
-            this.logger.info(`Found mint address for token ${tokenAddress}`, { decimals: mintAccount.decimals });
-            const decimals = mintAccount.decimals;
-            return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
-        } catch (e) {
-            this.logger.error(`Failed to divide token balance with decimals`, e as Error);
-            return '';
-        }
+        const tokenMintPubkey = new PublicKey(tokenAddress);
+        const mintAccount = await getMint(this.connection, tokenMintPubkey);
+        this.logger.info(`Found mint address for token ${tokenAddress}`, { decimals: mintAccount.decimals });
+        const decimals = mintAccount.decimals;
+        return (Number(tokenAmount)/decimals).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
     }
 
-    async buySolanaAsset(assetAddress: string, amountInSOL: string): Promise<BuyResponse> {
+    async buySolanaAsset(assetAddress: string, amountInSOL: string, userKey: Key): Promise<JupiterQuotesResponse> {
         this.logger.info(`Buying ${amountInSOL} SOL of ${assetAddress}`);
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
@@ -71,10 +66,17 @@ export default class SolanaService {
             }
         });
         this.logger.info(`Received quotes response: `, { quoteResponse });
-        const amountBought = await this.getHumanFriendlyTokenBalance(quoteResponse.outputMint, quoteResponse.outAmount);
-        return {
-            amountBought
-            // amountBought: quoteResponse.outAmount
-        };
+        const swapResponse = await this.jupiterAxios.post<JupiterSwapResponse>("swap", {
+            quoteResponse,
+            userPublicKey: userKey.publicKey,
+            wrapAndUnwrapSol: true,
+        });
+        this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
+        const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
+        const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+        this.logger.info(`Serialised transaction: ${transaction}`);
+        const wallet = Keypair.fromSecretKey(userKey.privateKey);
+        transaction.sign([wallet])
+        return quoteResponse;
     }
 }

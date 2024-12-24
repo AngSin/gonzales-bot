@@ -16,8 +16,8 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
-        const { amountBought } = await solanaService.buySolanaAsset(assetAddress, amountInSOL);
-        logger.debug(`amount bought: ${amountBought} ${symbol}, chat is of type: ${context.chat?.type}`);
+        const quotesResponse = await solanaService.buySolanaAsset(assetAddress, amountInSOL, solanaKey);
+        logger.debug(`amount bought: ${quotesResponse.outAmount} ${symbol}, chat is of type: ${context.chat?.type}`);
         await messagingService.sendMessage(context, `${context.from?.first_name} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat
     } else {
         logger.info(`No solanaKey exists for user ${userId}`);
