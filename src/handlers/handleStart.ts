@@ -37,9 +37,9 @@ const handleStart = async (context: Context) => {
         );
     }
     const inlineKeyboard = new InlineKeyboard()
-        .text('Refresh', 'start')
+        .text('Refresh', '/start')
         .row()
-        .text('Withdraw', 'withdraw')
+        .text('Withdraw', '/withdraw')
         .row();
     await messagingService.sendMessage(
         context,
