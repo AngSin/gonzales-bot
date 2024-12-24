@@ -37,11 +37,11 @@ const handleStart = async (context: Context) => {
         );
     }
     const inlineKeyboard = new InlineKeyboard()
-        .url('Refresh', `https://t.me/${context.me.username}?start`)
+        .url('Refresh', `https://t.me/${context.me.username}?start=1`)
         .row()
         .text('Withdraw', '/withdraw')
         .row()
-        .url('Decimals', `https://t.me/${context.me.username}?start=decimals`);
+        .url('Decimals', `https://t.me/${context.me.username}?decimals=1`);
     await messagingService.sendMessage(
         context,
         messageText,
