@@ -62,7 +62,8 @@ export default class SolanaService {
                 inputMint: NATIVE_MINT,
                 outputMint: assetAddress,
                 amount: amountInLamports,
-                slippageBps: 1,
+                autoSlippage: true,
+                maxAutoSlippageBps: 1_000, // 10%
             }
         });
         this.logger.info(`Received quotes response: `, { quoteResponse });
@@ -74,9 +75,11 @@ export default class SolanaService {
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
         const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        this.logger.info(`Serialised transaction: ${transaction}`);
+        this.logger.info(`Serialised transaction: `, { transaction });
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        transaction.sign([wallet])
+        transaction.sign([wallet]);
+        this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
+        await this.connection.sendTransaction(transaction);
         return quoteResponse;
     }
 }
