@@ -40,7 +40,8 @@ const handleStart = async (context: Context) => {
         .text('Refresh', '/start')
         .row()
         .text('Withdraw', '/withdraw')
-        .row();
+        .row()
+        .text('Decimals', '/decimals');
     await messagingService.sendMessage(
         context,
         messageText,
