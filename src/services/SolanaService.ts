@@ -79,7 +79,8 @@ export default class SolanaService {
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
         transaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
-        await this.connection.sendTransaction(transaction);
+        const txSignature = await this.connection.sendTransaction(transaction);
+        this.logger.info(`Sent signature: `, { txSignature });
         return quoteResponse;
     }
 }
