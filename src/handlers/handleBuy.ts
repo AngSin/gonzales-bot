@@ -24,7 +24,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
         const botUsername = context.me.username;
         const keyboard = new InlineKeyboard().url(
             "Set up wallet",
-            `https://t.me/${botUsername}`
+            `https://t.me/${botUsername}?start=1`
         );
         await messagingService.sendMessage(
             context,
