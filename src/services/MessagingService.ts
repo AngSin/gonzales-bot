@@ -38,7 +38,7 @@ export class MessagingService {
             this.escapeTelegramMarkup(messageText),
             {
                 parse_mode: "MarkdownV2",
-                reply_markup: inlineKeyboard,
+                reply_markup: pair.chainId === 'solana' ? inlineKeyboard : undefined,
                 reply_to_message_id: context.message?.message_id,
             }
         );
