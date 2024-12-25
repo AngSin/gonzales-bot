@@ -4,6 +4,7 @@ import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {getMint, NATIVE_MINT} from "@solana/spl-token";
 import {Key} from "../types";
+import {MessagingService} from "./MessagingService";
 
 type SwapMode = "ExactIn" | "ExactOut";
 
@@ -23,9 +24,17 @@ type JupiterSwapResponse = {
     swapTransaction: string;
 }
 
-type BuyResponse = {
-  amountBought: string;
-};
+type BuyResponse = BuyError | BuySuccess;
+
+type BuyError = {
+    success: false;
+    error: string;
+}
+
+type BuySuccess = {
+    success: true;
+    amountBought: string;
+}
 
 export default class SolanaService {
     readonly connection: Connection = new Connection(getMandatoryEnvVariable("SOLANA_RPC_URL"));
@@ -54,11 +63,14 @@ export default class SolanaService {
         });
     }
 
-    async buySolanaAsset(assetAddress: string, amountInSOL: string, userKey: Key): Promise<JupiterQuotesResponse> {
+    async buySolanaAsset(assetAddress: string, amountInSOL: string, userKey: Key): Promise<BuyResponse> {
         this.logger.info(`Buying ${amountInSOL} SOL of ${assetAddress}`);
         const humanFriendlySOLBalance = await this.getHumanFriendlySOLBalance(userKey.publicKey);
         if (Number(humanFriendlySOLBalance) <= Number(amountInSOL)) {
-            throw new Error(`User does not have enough balance. User balance: ${humanFriendlySOLBalance}. Tx Value: ${amountInSOL}`);
+            return {
+                success: false,
+                error: `User does not have enough balance. User balance: ${humanFriendlySOLBalance}. Tx Value: ${amountInSOL}`
+            }
         }
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
@@ -85,6 +97,9 @@ export default class SolanaService {
         this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
         const txSignature = await this.connection.sendTransaction(transaction);
         this.logger.info(`Sent signature: `, { txSignature });
-        return quoteResponse;
+        return {
+            success: true,
+            amountBought: quoteResponse.outAmount,
+        };
     }
 }
