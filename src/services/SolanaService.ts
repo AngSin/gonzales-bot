@@ -24,11 +24,15 @@ type JupiterSwapResponse = {
     swapTransaction: string;
 }
 
+export enum BuyErrorMessage {
+    INSUFFICIENT_BALANCE
+}
+
 type BuyResponse = BuyError | BuySuccess;
 
 type BuyError = {
     success: false;
-    error: string;
+    error: BuyErrorMessage;
 }
 
 type BuySuccess = {
@@ -69,7 +73,7 @@ export default class SolanaService {
         if (Number(humanFriendlySOLBalance) <= Number(amountInSOL)) {
             return {
                 success: false,
-                error: `User does not have enough balance. User balance: ${humanFriendlySOLBalance}. Tx Value: ${amountInSOL}`
+                error: BuyErrorMessage.INSUFFICIENT_BALANCE,
             }
         }
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
