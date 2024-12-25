@@ -56,6 +56,10 @@ export default class SolanaService {
 
     async buySolanaAsset(assetAddress: string, amountInSOL: string, userKey: Key): Promise<JupiterQuotesResponse> {
         this.logger.info(`Buying ${amountInSOL} SOL of ${assetAddress}`);
+        const humanFriendlySOLBalance = await this.getHumanFriendlySOLBalance(userKey.publicKey);
+        if (Number(humanFriendlySOLBalance) <= Number(amountInSOL)) {
+            throw new Error(`User does not have enough balance. User balance: ${humanFriendlySOLBalance}. Tx Value: ${amountInSOL}`);
+        }
         const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
             params: {
