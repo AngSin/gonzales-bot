@@ -13,8 +13,8 @@ const handleDecimals = async (context: Context) => {
     const messagingService = new MessagingService();
     const slot = await solanaService.connection.getSlot();
     logger.info(`Slot: ${slot}`);
-    const mintAccount = await getMint(solanaService.connection, new PublicKey('63LfDmNb3MQ8mw9MtZ2To9bEA2M71kZUUGq5tiJxcqj9'));
-    logger.info(`Mint account found`, { mintAccount });
+    // const mintAccount = await getMint(solanaService.connection, new PublicKey('63LfDmNb3MQ8mw9MtZ2To9bEA2M71kZUUGq5tiJxcqj9'));
+    logger.info(`Mint account found`, { mintAccount: undefined });
     // const humanFriendlyBalance = await solanaService.getHumanFriendlyTokenBalance('21AErpiB8uSb94oQKRcwuHqyHF93njAxBSbdUrpupump', '123456789')
     // await messagingService.sendMessage(context, `Human Friendly amount: ${humanFriendlyBalance}`);
 };
