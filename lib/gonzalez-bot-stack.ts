@@ -39,8 +39,8 @@ export class GonzalezBotStack extends cdk.Stack {
     solKeysTable.grantReadWriteData(taskRole);
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'GonzalezBotTask', {
-      memoryLimitMiB: 512,
-      cpu: 256,
+      memoryLimitMiB: 2048,
+      cpu: 1024,
       executionRole: taskExecutionRole,
       taskRole,
     });
