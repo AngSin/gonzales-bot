@@ -46,14 +46,21 @@ export default class SolanaService {
     });
     readonly logger: Logger = new Logger({ serviceName: 'SolanaService' });
 
-    async getHumanFriendlySOLBalance(pubkey: string): Promise<string> {
+    async getSOLBalance(pubkey: string): Promise<number> {
         const balanceInLamports = await this.connection.getBalance(new PublicKey(pubkey));
+        this.logger.info(`Found balance for user ${pubkey}: ${balanceInLamports} lamports`);
+        return balanceInLamports
+    }
+
+    async getHumanFriendlySOLBalance(pubkey: string): Promise<string> {
+        const balanceInLamports = await this.getSOLBalance(pubkey);
         const balanceInSOL = balanceInLamports/LAMPORTS_PER_SOL;
         return balanceInSOL.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
     }
+
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
         const tokenMintPubkey = new PublicKey(tokenAddress);
@@ -68,8 +75,8 @@ export default class SolanaService {
 
     async buySolanaAsset(assetAddress: string, amountInLamports: string, userKey: Key): Promise<BuyResponse> {
         this.logger.info(`Buying ${amountInLamports} lamps of ${assetAddress}`);
-        const humanFriendlySOLBalance = await this.getHumanFriendlySOLBalance(userKey.publicKey);
-        if (Number(humanFriendlySOLBalance) <= Number(amountInLamports)) {
+        const solBalance = await this.getSOLBalance(userKey.publicKey);
+        if (solBalance <= Number(amountInLamports)) {
             return {
                 success: false,
                 error: BuyErrorMessage.INSUFFICIENT_BALANCE,
