@@ -1,6 +1,6 @@
 import {Context} from "grammy";
 import {MessagingService} from "../services/MessagingService";
-import DexscreenerService from "../services/api";
+import DexscreenerService from "../services/DexscreenerService";
 import {getAddressFromMessage, getTickerFromMessage} from "../utils/string";
 
 const handleMessage = async (context: Context) => {

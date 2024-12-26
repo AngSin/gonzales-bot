@@ -8,8 +8,10 @@ export default class DexscreenerService {
 
     async searchAndRetrievePair(tickerOrAddress: string): Promise<Pair> {
         const searchResponse = await this.axios.get<DexScreenerSearchResponse>(`search`, { params: { q: tickerOrAddress } });
-        return searchResponse.data.pairs.reduce((highest, current) => {
-            return current.liquidity && highest.liquidity && current.liquidity.usd > highest.liquidity.usd ? current : highest;
-        }, searchResponse.data.pairs[0]);
+        return searchResponse.data.pairs
+            .filter(pair => pair.baseToken.symbol === tickerOrAddress || pair.baseToken.address === tickerOrAddress)
+            .reduce((highest, current) => {
+                return current.liquidity && highest.liquidity && current.liquidity.usd > highest.liquidity.usd ? current : highest;
+            }, searchResponse.data.pairs[0]);
     }
 }
