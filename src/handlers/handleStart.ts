@@ -3,7 +3,9 @@ import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import SolanaService from "../services/SolanaService";
 import {MessagingService} from "../services/MessagingService";
-import { InlineKeyboardButton } from "grammy/types";
+import {InlineKeyboardButton} from "grammy/types";
+import handleExport from "./handleExport";
+import {StartPayload} from "./types";
 
 const logger = new Logger({ serviceName: "handleStart" });
 
@@ -13,6 +15,14 @@ const handleStart = async (context: Context) => {
     logger.info(`Handling start ${JSON.stringify(context, null, 2)}`);
     const userId = context.from?.id.toString();
     if (!userId) return;
+    switch (context.match) {
+        case StartPayload.EXPORT:
+            return handleExport(context);
+        case StartPayload.WITHDRAW:
+            return () => {};
+        default:
+            break;
+    }
     let solanaKey = await solanaKeyService.getKey(userId);
     const solanaService = new SolanaService();
     let messageText: string;
@@ -26,8 +36,8 @@ const handleStart = async (context: Context) => {
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n` +
             `To buy a token, type its ticker symbol or CA into the chat`
         );
-        walletManagementButtons.push({ text: 'Export', url: `https://t.me/${context.me.username}?start=export` });
-        walletManagementButtons.push({ text: 'Withdraw', url: `https://t.me/${context.me.username}?start=withdraw` });
+        walletManagementButtons.push({ text: 'Export', url: `https://t.me/${context.me.username}?start=${StartPayload.EXPORT}` });
+        walletManagementButtons.push({ text: 'Withdraw', url: `https://t.me/${context.me.username}?start=${StartPayload.WITHDRAW}` });
     } else {
         logger.info(`No Solana key exists for user ${context.from?.username} with id: ${userId}`);
         solanaKey = await solanaKeyService.generateNewKey(userId);
@@ -41,7 +51,7 @@ const handleStart = async (context: Context) => {
         );
     }
     const inlineKeyboard = new InlineKeyboard()
-        .url('Refresh', `https://t.me/${context.me.username}?start=start`)
+        .url('Refresh', `https://t.me/${context.me.username}?start=${StartPayload.START}`)
         .row();
     inlineKeyboard.add(...walletManagementButtons);
     await messagingService.sendMessage(
