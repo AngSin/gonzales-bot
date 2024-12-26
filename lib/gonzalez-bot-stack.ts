@@ -54,6 +54,8 @@ export class GonzalezBotStack extends cdk.Stack {
         ETH_KEYS_TABLE: ethKeysTable.tableName,
         SOL_KEYS_TABLE: solKeysTable.tableName,
       },
+      memoryLimitMiB: 2048,
+      cpu: 1024,
     });
 
     new ecs.FargateService(this, 'GonzalezBotService', {
