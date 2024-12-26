@@ -24,3 +24,39 @@ export const getAddressFromMessage = (message: Message): string | undefined => {
 };
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+const oneBillion = 1_000_000_000;
+const oneMillion = 1_000_000;
+const oneThousand = 1_000;
+
+const getLargestDenominator = (num: number): {denominator: number; displayUnit: string;} => {
+    if (num >= oneBillion) {
+        return {
+            denominator: oneBillion,
+            displayUnit: 'B',
+        };
+    }
+    if (num >= oneMillion) {
+        return {
+            denominator: oneMillion,
+            displayUnit: 'M',
+        };
+    }
+    if (num >= oneThousand) {
+        return {
+            denominator: oneThousand,
+            displayUnit: 'K',
+        };
+    }
+    return { denominator: 1, displayUnit: ''};
+};
+
+export const displayHumanFriendlyNumber = (num: number): string => {
+    const { denominator, displayUnit } = getLargestDenominator(num);
+    const numberToDisplay = (num/denominator).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+
+    return `$${numberToDisplay} ${displayUnit}`;
+}
