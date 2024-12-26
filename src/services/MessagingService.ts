@@ -20,7 +20,7 @@ export class MessagingService {
 
     async replyWithPairInfo (context: Context, pair: Pair) {
         const amounts = ['0.1', '0.5', '1'];
-        const inlineKeyboard = new InlineKeyboard();// .text('BUY', `buy:${pair.baseToken.address}:${pair.baseToken.symbol}`);
+        const inlineKeyboard = new InlineKeyboard();
         inlineKeyboard.add(...amounts.map(amount => ({
             text: `BUY ${amount} SOL`,
             callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol}:${amount}`,

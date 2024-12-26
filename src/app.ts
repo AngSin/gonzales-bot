@@ -3,6 +3,8 @@ import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import handleStart from "./handlers/handleStart";
 import handleBuy from "./handlers/handleBuy";
 import handleMessage from "./handlers/handleMessage";
+import {Commands} from "./handlers/types";
+import handleExport from "./handlers/handleExport";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
 
@@ -16,6 +18,15 @@ bot.on("callback_query:data", async (context) => {
     const callbackData = context.callbackQuery?.data;
     const userId = context.from?.id.toString();
     console.log(`Received callback query: ${callbackData} from user ${context.from.username} with user id ${userId}`);
+
+    switch (callbackData) {
+        case Commands.EXPORT:
+            return handleExport(context);
+        case Commands.WITHDRAW:
+            return () => {};
+        default:
+            break;
+    }
 
     const [direction, tokenAddress, ticker, amountInSOL] = callbackData.split(':');
 

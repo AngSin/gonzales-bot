@@ -1,5 +1,4 @@
-export enum StartPayload {
-    START = 'start',
+export enum Commands {
     EXPORT = 'export',
     WITHDRAW = 'withdraw',
 }
