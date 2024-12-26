@@ -3,11 +3,15 @@ import {getMandatoryEnvVariable} from "./utils/getMandatoryEnvVariable";
 import handleStart from "./handlers/handleStart";
 import handleBuy from "./handlers/handleBuy";
 import handleMessage from "./handlers/handleMessage";
+import handleExport from "./handlers/handleExport";
 
 const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
 
 const bot = new Bot(botToken);
+
 bot.command("start", handleStart);
+
+bot.command('export', handleExport);
 
 bot.on("message", handleMessage);
 

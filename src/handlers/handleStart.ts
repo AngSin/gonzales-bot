@@ -3,6 +3,7 @@ import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import SolanaService from "../services/SolanaService";
 import {MessagingService} from "../services/MessagingService";
+import { InlineKeyboardButton } from "grammy/types";
 
 const logger = new Logger({ serviceName: "handleStart" });
 
@@ -15,6 +16,7 @@ const handleStart = async (context: Context) => {
     let solanaKey = await solanaKeyService.getKey(userId);
     const solanaService = new SolanaService();
     let messageText: string;
+    const walletManagementButtons: InlineKeyboardButton[] = [];
     if (solanaKey) {
         const balance = await solanaService.getHumanFriendlySOLBalance(solanaKey.publicKey)
         messageText = (
@@ -24,6 +26,8 @@ const handleStart = async (context: Context) => {
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n` +
             `To buy a token, type its ticker symbol or CA into the chat`
         );
+        walletManagementButtons.push({ text: 'Export', url: `https://t.me/${context.me.username}?export=1` });
+        walletManagementButtons.push({ text: 'Withdraw', url: `https://t.me/${context.me.username}?withdraw=1` });
     } else {
         logger.info(`No Solana key exists for user ${context.from?.username} with id: ${userId}`);
         solanaKey = await solanaKeyService.generateNewKey(userId);
@@ -38,8 +42,8 @@ const handleStart = async (context: Context) => {
     }
     const inlineKeyboard = new InlineKeyboard()
         .url('Refresh', `https://t.me/${context.me.username}?start=1`)
-        .row()
-        .text('Withdraw', '/withdraw');
+        .row();
+    inlineKeyboard.add(...walletManagementButtons);
     await messagingService.sendMessage(
         context,
         messageText,
