@@ -23,7 +23,7 @@ const handleExport = async (context: Context) => {
     const privateKey = Buffer.from(key.privateKey).toString("base64");
     const messageText = (
       `You may export your wallet by using this private key:\n\n` +
-      `\`${privateKey}\`\n\n` +
+      `\`${privateKey} (tap to copy)\`\n\n` +
       `Remember! Do not share this private key with anyone`
     );
     const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${context.me.username}?start=${StartPayload.START}`);

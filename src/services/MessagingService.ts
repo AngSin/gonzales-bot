@@ -30,7 +30,7 @@ export class MessagingService {
             `💹 $${pair.baseToken.symbol}\n\n` +
             `💰 $${pair.priceUsd.toLocaleString()}\n` +
             `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n\n` +
-            `   \`${pair.baseToken.address}\`\n`); // Telegram MarkdownV2 text doesn't allow "."
+            `   \`${pair.baseToken.address}\` (tap to copy)\n`);
 
         this.logger.info(`Replying to message with: ${messageText}`);
 
