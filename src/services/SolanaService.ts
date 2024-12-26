@@ -2,10 +2,8 @@ import {Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, VersionedTransaction} 
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
-import {Account, getMint, NATIVE_MINT} from "@solana/spl-token";
+import {Account, getAccount, getAssociatedTokenAddressSync, getMint, NATIVE_MINT} from "@solana/spl-token";
 import {Key} from "../types";
-import {getAssociatedTokenAddressSync} from "@solana/spl-token/src/state/mint";
-import {getAccount} from "@solana/spl-token/src/state/account";
 
 type SwapMode = "ExactIn" | "ExactOut";
 
