@@ -52,7 +52,8 @@ const handleStart = async (context: Context) => {
     }
     const inlineKeyboard = new InlineKeyboard()
         .url('Refresh', `https://t.me/${context.me.username}?start=${StartPayload.START}`)
-        .row();
+        .row()
+        .text('Test', '/test');
     inlineKeyboard.add(...walletManagementButtons);
     await messagingService.sendMessage(
         context,
