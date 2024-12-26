@@ -34,7 +34,7 @@ const handleMessage = async (context: Context) => {
 
     let tokenAccount: Account | undefined;
     if (userKey) {
-        tokenAccount = await solanaService.getTokenAccount(pair.baseToken.address, userKey.publicKey);
+        // tokenAccount = await solanaService.getTokenAccount(pair.baseToken.address, userKey.publicKey);
     }
 
     await messagingService.replyWithPairInfo(context, pair, tokenAccount);
