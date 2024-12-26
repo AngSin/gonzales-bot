@@ -105,11 +105,16 @@ export default class SolanaService {
         };
     }
 
-    async getTokenAccount(assetAddress: string, userAddress: string): Promise<Account> {
-        const tokenAccountAddress = getAssociatedTokenAddressSync(new PublicKey(assetAddress), new PublicKey(userAddress));
-        this.logger.info(`Found token address: ${tokenAccountAddress}`);
-        const tokenAccount = await getAccount(this.connection, tokenAccountAddress);
-        this.logger.info(`Found token account: `, { tokenAccount });
-        return tokenAccount;
+    async getTokenAccount(assetAddress: string, userAddress: string): Promise<Account | undefined> {
+        try {
+            const tokenAccountAddress = getAssociatedTokenAddressSync(new PublicKey(assetAddress), new PublicKey(userAddress));
+            this.logger.info(`Found token address: ${tokenAccountAddress}`);
+            const tokenAccount = await getAccount(this.connection, tokenAccountAddress);
+            this.logger.info(`Found token account: `, { tokenAccount });
+            return tokenAccount;
+        } catch (e) {
+            this.logger.error(`Couldn't find token account for mint address: ${assetAddress}`);
+            return undefined;
+        }
     }
 }
