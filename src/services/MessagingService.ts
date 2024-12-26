@@ -2,6 +2,8 @@ import {Pair} from "../types";
 import {Context, InlineKeyboard} from "grammy";
 import {capitalize, displayHumanFriendlyNumber} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
+import {Account} from "@solana/spl-token";
+import {LAMPORTS_PER_SOL} from "@solana/web3.js";
 
 export class MessagingService {
     readonly logger: Logger;
@@ -18,13 +20,21 @@ export class MessagingService {
         );
     };
 
-    async replyWithPairInfo (context: Context, pair: Pair) {
-        const amounts = ['0.1', '0.5', '1'];
+    async replyWithPairInfo (context: Context, pair: Pair, tokenAccount?: Account) {
+        const amounts = ['.1', '.5', '1'];
         const inlineKeyboard = new InlineKeyboard();
+
         inlineKeyboard.add(...amounts.map(amount => ({
             text: `BUY ${amount} SOL`,
-            callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol}:${amount}`,
+            callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol}:${Number(amount) * LAMPORTS_PER_SOL}`,
         })));
+
+        if (tokenAccount && tokenAccount.amount > 0n) {
+            inlineKeyboard.add(
+                { text: 'SELL 50%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:${tokenAccount.amount/2n}` },
+                { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:${tokenAccount.amount}` }
+            );
+        }
         const messageText = (`✍️ ${pair.baseToken.name}\n` +
             `🌐 ${capitalize(pair.chainId)}\n` +
             `💹 $${pair.baseToken.symbol}\n\n` +

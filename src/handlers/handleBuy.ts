@@ -27,7 +27,7 @@ const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Co
     }
 }
 
-const handleBuy = async (context: Context, assetAddress: string, userId: string, symbol: string, amountInSOL: string) => {
+const handleBuy = async (context: Context, assetAddress: string, userId: string, symbol: string, amountInLamports: string) => {
     const solanaKeyService = new SolanaKeyService();
     const solanaService = new SolanaService();
 
@@ -36,7 +36,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
-        const purchase = await solanaService.buySolanaAsset(assetAddress, amountInSOL, solanaKey);
+        const purchase = await solanaService.buySolanaAsset(assetAddress, amountInLamports, solanaKey);
         if (purchase.success) {
             logger.debug(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.chat?.type}`);
             await messagingService.sendMessage(context, `${context.from?.first_name} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat

@@ -2,9 +2,10 @@ import {Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, VersionedTransaction} 
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
-import {getMint, NATIVE_MINT} from "@solana/spl-token";
+import {Account, getMint, NATIVE_MINT} from "@solana/spl-token";
 import {Key} from "../types";
-import {MessagingService} from "./MessagingService";
+import {getAssociatedTokenAddressSync} from "@solana/spl-token/src/state/mint";
+import {getAccount} from "@solana/spl-token/src/state/account";
 
 type SwapMode = "ExactIn" | "ExactOut";
 
@@ -67,16 +68,15 @@ export default class SolanaService {
         });
     }
 
-    async buySolanaAsset(assetAddress: string, amountInSOL: string, userKey: Key): Promise<BuyResponse> {
-        this.logger.info(`Buying ${amountInSOL} SOL of ${assetAddress}`);
+    async buySolanaAsset(assetAddress: string, amountInLamports: string, userKey: Key): Promise<BuyResponse> {
+        this.logger.info(`Buying ${amountInLamports} lamps of ${assetAddress}`);
         const humanFriendlySOLBalance = await this.getHumanFriendlySOLBalance(userKey.publicKey);
-        if (Number(humanFriendlySOLBalance) <= Number(amountInSOL)) {
+        if (Number(humanFriendlySOLBalance) <= Number(amountInLamports)) {
             return {
                 success: false,
                 error: BuyErrorMessage.INSUFFICIENT_BALANCE,
             }
         }
-        const amountInLamports = Number(amountInSOL) * LAMPORTS_PER_SOL;
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
             params: {
                 inputMint: NATIVE_MINT,
@@ -105,5 +105,13 @@ export default class SolanaService {
             success: true,
             amountBought: quoteResponse.outAmount,
         };
+    }
+
+    async getTokenAccount(assetAddress: string, userAddress: string): Promise<Account> {
+        const tokenAccountAddress = getAssociatedTokenAddressSync(new PublicKey(assetAddress), new PublicKey(userAddress));
+        this.logger.info(`Found token address: ${tokenAccountAddress}`);
+        const tokenAccount = await getAccount(this.connection, tokenAccountAddress);
+        this.logger.info(`Found token account: `, { tokenAccount });
+        return tokenAccount;
     }
 }

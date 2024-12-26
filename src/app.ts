@@ -28,11 +28,11 @@ bot.on("callback_query:data", async (context) => {
             break;
     }
 
-    const [direction, tokenAddress, ticker, amountInSOL] = callbackData.split(':');
+    const [direction, tokenAddress, ticker, amountInLamports] = callbackData.split(':');
 
     if (!direction || !callbackData.startsWith('buy:')) return;
 
-    await handleBuy(context, tokenAddress, userId, ticker, amountInSOL);
+    await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
 });
 
 bot.start();
