@@ -67,7 +67,7 @@ export class MessagingService {
             `💰 $${pair.priceUsd.toLocaleString()}\n` +
             `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n` +
             `⏳ 24hr Vol: ${displayHumanFriendlyNumber(pair.volume.h24)}\n\n` +
-            `   \`${pair.baseToken.address}\` (tap to copy)\n` +
+            `       \`${pair.baseToken.address}\` (tap to copy)\n\n` +
             `${this.getWarnings(pair)}`
         );
 
