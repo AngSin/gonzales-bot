@@ -20,7 +20,7 @@ const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Ca
                 );
                 await messagingService.sendMessage(
                     context,
-                    `${context.from?.firstName}, your purchase failed (insufficient balance). Message me to fund your wallet.`,
+                    `${context.callbackQuery?.from?.firstName}, your purchase failed (insufficient balance). Message me to fund your wallet.`,
                     keyboard,
                 );
             }
@@ -31,15 +31,14 @@ const handleBuy = async (context: Camelized<Context>, assetAddress: string, user
     const solanaKeyService = new SolanaKeyService();
     const solanaService = new SolanaService();
 
-    // await context.answerCallbackQuery({ text: `${context.from?.firstName} is buying ${symbol}...` });
     const solanaKey = await solanaKeyService.getKey(userId);
 
     if (solanaKey) {
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
         const purchase = await solanaService.buySolanaAsset(assetAddress, amountInLamports, solanaKey);
         if (purchase.success) {
-            logger.debug(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.chat?.type}`);
-            await messagingService.sendMessage(context, `${context.from?.firstName} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat
+            logger.debug(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.callbackQuery?.message?.chat?.type}`);
+            await messagingService.sendMessage(context, `${context.callbackQuery?.from?.firstName} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat
         } else {
             await handlePurchaseError(purchase.error, context);
         }
@@ -51,7 +50,7 @@ const handleBuy = async (context: Camelized<Context>, assetAddress: string, user
         );
         await messagingService.sendMessage(
             context,
-            `${context.from?.firstName}, you do not have a Gonzales wallet. DM me to get started`,
+            `${context.callbackQuery?.from?.firstName}, you do not have a Gonzales wallet. DM me to get started`,
             keyboard,
         );
     }
