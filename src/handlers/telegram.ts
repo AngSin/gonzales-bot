@@ -9,7 +9,7 @@ const logger = new Logger({ serviceName: 'TelegramHandler' });
 export const handler = async (event: APIGatewayProxyEventV2) => {
     logger.info(`Received telegram event`, { event });
     const context = JSON.parse(event.body || '{}') as Context;
-    if (!context.from) {
+    if (!context.message) {
         logger.error(`Error, malformed request`);
         return;
     }
