@@ -62,3 +62,8 @@ export const displayHumanFriendlyNumber = (num: number): string => {
 
     return `$${numberToDisplay} ${displayUnit}`;
 }
+
+export const wrapMessageInWarningSigns = (str: string, level: 'warning' | 'danger') => {
+    const emoji = level === 'danger' ? '‼️' : '⚠️';
+    return `${emoji}${emoji}${emoji}️ ${str} ${emoji}${emoji}${emoji}`;
+}

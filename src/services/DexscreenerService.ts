@@ -11,7 +11,7 @@ export default class DexscreenerService {
         return searchResponse.data.pairs
             .filter(pair => pair.baseToken.symbol === tickerOrAddress || pair.baseToken.address === tickerOrAddress)
             .reduce((highest, current) => {
-                return current.liquidity && highest.liquidity && current.liquidity.usd > highest.liquidity.usd ? current : highest;
+                return current.volume.h24 > highest.volume.h24 ? current : highest;
             }, searchResponse.data.pairs[0]);
     }
 }

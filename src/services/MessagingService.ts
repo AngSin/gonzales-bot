@@ -26,6 +26,23 @@ export class MessagingService {
         );
     };
 
+    private wrapMessageInWarningSigns = (str: string, level: 'warning' | 'danger') => {
+        const emoji = level === 'danger' ? '‼️' : '⚠️';
+        return `${emoji}${emoji}${emoji}️ ${str} ${emoji}${emoji}${emoji}`;
+    };
+
+    private getWarnings = (pair: Pair): string => {
+        const now = Date.now();
+        const twoWeeks = 60 * 60 * 24 * 1_000;
+        const wasPairCreatedWithinTwoWeeks = (now - pair.pairCreatedAt) <= twoWeeks;
+        let warnings = '';
+        if (wasPairCreatedWithinTwoWeeks) {
+            warnings += `${this.wrapMessageInWarningSigns(`This pair is new!`, 'danger')}\n`;
+        }
+
+        return warnings;
+    };
+
     async replyWithPairInfo (context: Camelized<Context>, pair: Pair, tokenAccount?: Account) {
         const amounts = ['.1', '.5', '1'];
         const inlineKeyboard = new InlineKeyboard();
@@ -42,12 +59,15 @@ export class MessagingService {
                 { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:1` }
             );
         }
-        const messageText = (`✍️ ${pair.baseToken.name}\n` +
+
+        const messageText = (
+            `✍️ ${pair.baseToken.name}\n` +
             `🌐 ${capitalize(pair.chainId)}\n` +
             `💹 $${pair.baseToken.symbol}\n\n` +
             `💰 $${pair.priceUsd.toLocaleString()}\n` +
             `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n\n` +
-            `   \`${pair.baseToken.address}\` (tap to copy)\n`);
+            `   \`${pair.baseToken.address}\` (tap to copy)\n`
+        );
 
         this.logger.info(`Replying to message with: ${messageText}`);
 
