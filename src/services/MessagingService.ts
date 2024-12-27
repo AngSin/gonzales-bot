@@ -33,7 +33,7 @@ export class MessagingService {
 
     private getWarnings = (pair: Pair): string => {
         const now = Date.now();
-        const twoWeeks = 60 * 60 * 24 * 1_000;
+        const twoWeeks = 1_000 * 60 * 60 * 24 * 14;
         const wasPairCreatedWithinTwoWeeks = (now - pair.pairCreatedAt) <= twoWeeks;
         let warnings = '';
         if (wasPairCreatedWithinTwoWeeks) {
@@ -65,8 +65,10 @@ export class MessagingService {
             `🌐 ${capitalize(pair.chainId)}\n` +
             `💹 $${pair.baseToken.symbol}\n\n` +
             `💰 $${pair.priceUsd.toLocaleString()}\n` +
-            `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n\n` +
-            `   \`${pair.baseToken.address}\` (tap to copy)\n`
+            `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n` +
+            `⏳ 24hr Vol: ${displayHumanFriendlyNumber(pair.volume.h24)}\n\n` +
+            `   \`${pair.baseToken.address}\` (tap to copy)\n` +
+            `${this.getWarnings(pair)}`
         );
 
         this.logger.info(`Replying to message with: ${messageText}`);
