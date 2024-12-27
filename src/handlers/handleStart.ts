@@ -43,9 +43,8 @@ const handleStart = async (context: Camelized<Context>) => {
         );
     }
     const inlineKeyboard = new InlineKeyboard()
-        .url('Refresh', `https://t.me/${botUsername}?start`)
+        .text('Refresh', Commands.START)
         .row()
-        .text('Test', '/test');
     inlineKeyboard.add(...walletManagementButtons);
     await messagingService.sendMessage(
         context,
