@@ -36,7 +36,8 @@ export class MessagingService {
         })));
 
         if (tokenAccount && tokenAccount.amount > 0n) {
-            inlineKeyboard.add(
+            inlineKeyboard.row();
+            inlineKeyboard.row(
                 { text: 'SELL 50%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:2` },
                 { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:1` }
             );
