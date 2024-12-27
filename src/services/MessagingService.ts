@@ -55,11 +55,11 @@ export class MessagingService {
 
     async sendMessage(context: Camelized<Context>, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await this.axios.post('sendMessage', decamelizeKeys({
-            chatId: context.message?.chat.id,
+            chatId: (context.message || context.callbackQuery?.message)?.chat.id,
             text: this.escapeTelegramMarkup(messageText),
             replyMarkup: inlineKeyboard,
             parseMode: "Markdown",
-            replyTo: isReply ? context.message?.messageId : undefined,
+            replyTo: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
         }));
     };
 }

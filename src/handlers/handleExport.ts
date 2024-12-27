@@ -11,7 +11,7 @@ const handleExport = async (context: Camelized<Context>) => {
     logger.info(`Handling export, context: `, { context });
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
-    const userId = context.from?.id.toString();
+    const userId = context.callbackQuery?.from?.id.toString();
     if (!userId) {
         logger.error(`For some reason the user id does not exist in this context`, { context });
         return;
