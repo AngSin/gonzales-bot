@@ -56,7 +56,7 @@ export class MessagingService {
 
     async replyWithNewSOLWallet(context: Context, pubKey: string) {
         const messageText = (
-            `You do not have a Gonzalez Wallet for Solana yet. We created one for you. Send SOL to this address to be able to trade on Gonzalez: \n\n` +
+            `You do not have a Gonzales Wallet for Solana yet. We created one for you. Send SOL to this address to be able to trade on Gonzales: \n\n` +
             `\`${pubKey}\n\``
         );
         await context.reply(

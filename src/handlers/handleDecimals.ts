@@ -2,8 +2,6 @@ import SolanaService from "../services/SolanaService";
 import {Context} from "grammy";
 import {MessagingService} from "../services/MessagingService";
 import {Logger} from "@aws-lambda-powertools/logger";
-import {getMint} from "@solana/spl-token";
-import {PublicKey} from "@solana/web3.js";
 
 const logger = new Logger({ serviceName: 'handleDecimals' })
 

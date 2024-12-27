@@ -52,7 +52,7 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
         );
         await messagingService.sendMessage(
             context,
-            `${context.from?.first_name}, you do not have a Gonzalez wallet. DM me to get started`,
+            `${context.from?.first_name}, you do not have a Gonzales wallet. DM me to get started`,
             keyboard,
         );
     }

@@ -40,5 +40,3 @@ bot.on("callback_query:data", async (context) => {
 
     await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
 });
-
-bot.start();
