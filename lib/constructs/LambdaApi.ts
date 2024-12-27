@@ -48,7 +48,7 @@ export class LambdaApi {
     this.lambda = new NodejsFunction(scope, `${apiName}Handler`, {
       runtime: Runtime.NODEJS_22_X,
       timeout: Duration.seconds(5),
-      architecture: Architecture.ARM_64,
+      architecture: Architecture.X86_64,
       description: `Handler function for the ${id} api`,
       memorySize: 256,
       entry: path.join(__dirname, `../../src/handlers/${entryFile}`),
