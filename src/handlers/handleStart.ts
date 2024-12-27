@@ -12,7 +12,7 @@ const handleStart = async (context: Context) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     logger.info(`Handling start ${JSON.stringify(context, null, 2)}`);
-    const userId = context.from?.id.toString();
+    const userId = context.message?.from?.id.toString();
     if (!userId) return;
     let solanaKey = await solanaKeyService.getKey(userId);
     const solanaService = new SolanaService();

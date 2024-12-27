@@ -4,8 +4,13 @@ import {capitalize, displayHumanFriendlyNumber} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {Account} from "@solana/spl-token";
 import {LAMPORTS_PER_SOL} from "@solana/web3.js";
+import axios, { AxiosInstance } from "axios";
+import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 
 export class MessagingService {
+    private axios: AxiosInstance = axios.create({
+        baseURL: `https://api.telegram.org/bot${getMandatoryEnvVariable('TELEGRAM_BOT_TOKEN')}/`
+    });
     readonly logger: Logger;
     constructor() {
         this.logger = new Logger({ serviceName: "MessagingService"});
@@ -44,37 +49,16 @@ export class MessagingService {
 
         this.logger.info(`Replying to message with: ${messageText}`);
 
-        await context.reply(
-            this.escapeTelegramMarkup(messageText),
-            {
-                parse_mode: "MarkdownV2",
-                reply_markup: pair.chainId === 'solana' ? inlineKeyboard : undefined,
-                reply_to_message_id: context.message?.message_id,
-            }
-        );
-    };
-
-    async replyWithNewSOLWallet(context: Context, pubKey: string) {
-        const messageText = (
-            `You do not have a Gonzales Wallet for Solana yet. We created one for you. Send SOL to this address to be able to trade on Gonzales: \n\n` +
-            `\`${pubKey}\n\``
-        );
-        await context.reply(
-            this.escapeTelegramMarkup(messageText),
-            {
-                parse_mode: "MarkdownV2",
-            }
-        );
+        await this.sendMessage(context, messageText, pair.chainId === 'solana' ? inlineKeyboard : undefined, true);
     };
 
     async sendMessage(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
-        await context.reply(
-            this.escapeTelegramMarkup(messageText),
-            {
-                parse_mode: "MarkdownV2",
-                reply_markup: inlineKeyboard,
-                reply_to_message_id: isReply ? context.message?.message_id : undefined,
-            }
-        );
+        await this.axios.post('sendMessage', {
+            chat_id: context.message?.chat.id,
+            text: this.escapeTelegramMarkup(messageText),
+            reply_markup: inlineKeyboard,
+            // parse_mode: "MarkdownV2",
+            reply_to: isReply ? context.message?.message_id : undefined,
+        })
     };
 }

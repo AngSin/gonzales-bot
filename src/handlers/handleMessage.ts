@@ -22,7 +22,7 @@ const handleMessage = async (context: Context) => {
     const addressOrTicker = address || ticker;
     if (!addressOrTicker) return;
 
-    const userId = context.from?.id.toString();
+    const userId = context.message?.from?.id.toString();
 
     // message verification complete
     logger.info(`Found address or ticker: ${addressOrTicker}`);
