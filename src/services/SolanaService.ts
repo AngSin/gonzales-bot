@@ -75,8 +75,12 @@ export default class SolanaService {
         });
     }
 
-    async buySolanaAsset(assetAddress: string, amountInLamports: string, userKey: Key): Promise<BuyResponse> {
-        this.logger.info(`Buying ${amountInLamports} lamps of ${assetAddress}`);
+    async tradeSolanaAsset(assetAddress: string, amountInLamports: string, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
+        if (isSell) {
+            this.logger.info(`Selling ${amountInLamports} of ${assetAddress} for SOL`);
+        } else {
+            this.logger.info(`Buying ${amountInLamports} lamps of ${assetAddress}`);
+        }
         const solBalance = await this.getSOLBalance(userKey.publicKey);
         if (solBalance <= Number(amountInLamports)) {
             return {
@@ -86,8 +90,8 @@ export default class SolanaService {
         }
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
             params: {
-                inputMint: NATIVE_MINT,
-                outputMint: assetAddress,
+                inputMint: isSell ? assetAddress : NATIVE_MINT,
+                outputMint: isSell ? NATIVE_MINT : assetAddress,
                 amount: amountInLamports,
                 autoSlippage: true,
                 maxAutoSlippageBps: 1_000, // 10%
@@ -126,7 +130,7 @@ export default class SolanaService {
             this.logger.info(`Found token account: `, { tokenAccount });
             return tokenAccount;
         } catch (e) {
-            this.logger.error(`Couldn't find token account for mint address: ${assetAddress}`);
+            this.logger.info(`Couldn't find token account for mint address: ${assetAddress}`);
             return undefined;
         }
     }
