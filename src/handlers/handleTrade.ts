@@ -30,7 +30,7 @@ const handleTrade = async (context: Camelized<Context>) => {
         return await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
     } else {
         const divider = BigInt(num);
-        return await handleSell(tokenAddress, userId, username, ticker, divider);
+        return await handleSell(tokenAddress, userId, username, ticker, divider, context);
     }
 };
 
