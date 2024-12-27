@@ -2,7 +2,7 @@ import {Context, InlineKeyboard} from "grammy";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {MessagingService} from "../services/MessagingService";
-import SolanaService, {BuyErrorMessage} from "../services/SolanaService";
+import SolanaService, {botUsername, BuyErrorMessage} from "../services/SolanaService";
 
 const logger = new Logger({ serviceName: 'handleBuy' });
 const messagingService = new MessagingService();
@@ -13,7 +13,6 @@ const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Co
             if (context.chat?.type === 'private') {
                 await messagingService.sendMessage(context, "You do not have enough SOL balance for the purchase!");
             } else {
-                const botUsername = context.me.username;
                 const keyboard = new InlineKeyboard().url(
                     "Fund wallet",
                     `https://t.me/${botUsername}?start=1`
@@ -45,7 +44,6 @@ const handleBuy = async (context: Context, assetAddress: string, userId: string,
         }
     } else {
         logger.info(`No solanaKey exists for user ${userId}`);
-        const botUsername = context.me.username;
         const keyboard = new InlineKeyboard().url(
             "Set up wallet",
             `https://t.me/${botUsername}?start=1`

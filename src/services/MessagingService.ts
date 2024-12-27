@@ -17,7 +17,7 @@ export class MessagingService {
     };
 
     private escapeTelegramMarkup(text: string): string {
-        const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '!'];
 
         return text.replace(
             new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),

@@ -1,7 +1,7 @@
 import {Context, InlineKeyboard} from "grammy";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
-import SolanaService from "../services/SolanaService";
+import SolanaService, {botUsername} from "../services/SolanaService";
 import {MessagingService} from "../services/MessagingService";
 import {InlineKeyboardButton} from "grammy/types";
 import {Commands} from "./types";
@@ -30,7 +30,7 @@ const handleStart = async (context: Context) => {
         walletManagementButtons.push({ text: 'Export', callback_data: Commands.EXPORT });
         walletManagementButtons.push({ text: 'Withdraw', callback_data: Commands.EXPORT });
     } else {
-        logger.info(`No Solana key exists for user ${context.from?.username} with id: ${userId}`);
+        logger.info(`No Solana key exists for user ${context.message?.from.username} with id: ${userId}`);
         solanaKey = await solanaKeyService.generateNewKey(userId);
         logger.info(`Created solana key ${solanaKey.publicKey} for user ${userId}`);
         messageText = (
@@ -42,7 +42,7 @@ const handleStart = async (context: Context) => {
         );
     }
     const inlineKeyboard = new InlineKeyboard()
-        .url('Refresh', `https://t.me/${context.me.username}?start=1`)
+        .url('Refresh', `https://t.me/${botUsername}?start=1`)
         .row()
         .text('Test', '/test');
     inlineKeyboard.add(...walletManagementButtons);

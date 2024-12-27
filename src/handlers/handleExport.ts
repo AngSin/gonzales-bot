@@ -2,8 +2,9 @@ import {Context, InlineKeyboard} from "grammy";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {MessagingService} from "../services/MessagingService";
+import {botUsername} from "../services/SolanaService";
 
-const logger = new Logger({ })
+const logger = new Logger({ serviceName: 'handleExport' });
 
 const handleExport = async (context: Context) => {
     logger.info(`Handling export, context: `, { context });
@@ -25,7 +26,7 @@ const handleExport = async (context: Context) => {
       `\`${privateKey} (tap to copy)\`\n\n` +
       `Remember! Do not share this private key with anyone`
     );
-    const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${context.me.username}?start=1`);
+    const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${botUsername}?start=1`);
     await messagingService.sendMessage(context, messageText, inlineKeyboard);
 };
 
