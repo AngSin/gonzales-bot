@@ -112,10 +112,12 @@ export default class SolanaService {
         this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
         const txSignature = await this.connection.sendTransaction(transaction, {
             skipPreflight: false,
-            maxRetries: 2,
-            preflightCommitment: 'confirmed',
+            maxRetries: 5,
+            preflightCommitment: 'processed',
         });
         this.logger.info(`Sent signature: `, { txSignature });
+        await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
+        this.logger.info(`Waiting 2 seconds finished`);
         return {
             success: true,
             amountBought: quoteResponse.outAmount,
