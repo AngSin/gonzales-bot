@@ -17,7 +17,7 @@ export class MessagingService {
     };
 
     private escapeTelegramMarkup(text: string): string {
-        const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '!'];
+        const specialCharacters = ['_', '*', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
 
         return text.replace(
             new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),
@@ -55,10 +55,9 @@ export class MessagingService {
     async sendMessage(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await this.axios.post('sendMessage', {
             chat_id: context.message?.chat.id,
-            // text: this.escapeTelegramMarkup(messageText),
-            text: messageText,
+            text: this.escapeTelegramMarkup(messageText),
             reply_markup: inlineKeyboard,
-            parse_mode: "MarkdownV2",
+            parse_mode: "Markdown",
             reply_to: isReply ? context.message?.message_id : undefined,
         })
     };
