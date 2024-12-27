@@ -60,6 +60,6 @@ export class MessagingService {
             replyMarkup: inlineKeyboard,
             parseMode: "Markdown",
             replyTo: isReply ? context.message?.messageId : undefined,
-        }))
+        }));
     };
 }
