@@ -26,7 +26,10 @@ const actionsCname = 'actions';
 const apiCname = 'api';
 
 const certificateStack = new CertificateStack(app, 'GonzalezCertificate', {
-    env,
+    env: {
+        ...env,
+        region: 'us-east-1', // certificate must be in us-east-1
+    },
     domain: 'gonzalesbot.com',
     crossRegionReferences: true,
 })
