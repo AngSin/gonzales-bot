@@ -11,7 +11,7 @@ const messagingService = new MessagingService();
 const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Camelized<Context>) => {
     switch (buyErrorMessage) {
         case BuyErrorMessage.INSUFFICIENT_BALANCE:
-            if (context.chat?.type === 'private') {
+            if (context.callbackQuery?.message?.chat?.type === 'private') {
                 await messagingService.sendMessage(context, "You do not have enough SOL balance for the purchase!");
             } else {
                 const keyboard = new InlineKeyboard().url(
