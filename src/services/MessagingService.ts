@@ -57,7 +57,7 @@ export class MessagingService {
             chat_id: context.message?.chat.id,
             text: this.escapeTelegramMarkup(messageText),
             reply_markup: inlineKeyboard,
-            // parse_mode: "MarkdownV2",
+            parse_mode: "MarkdownV2",
             reply_to: isReply ? context.message?.message_id : undefined,
         })
     };
