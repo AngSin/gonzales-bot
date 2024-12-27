@@ -9,7 +9,6 @@ import * as cdk from "aws-cdk-lib";
 
 export interface CertificateStackProps extends StackProps {
     domain: string;
-    cnames: Array<string>;
 }
 
 export class CertificateStack extends cdk.Stack {
@@ -19,15 +18,15 @@ export class CertificateStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props: CertificateStackProps) {
         super(scope, id, props);
 
-        const { domain, cnames } = props;
+        const { domain } = props;
 
         this.zone = PublicHostedZone.fromLookup(this, "Zone", {
             domainName: domain,
         });
 
-        this.certificate = new Certificate(this, `Cert`, {
-            domainName: `${cnames[0]}.${domain}`,
-            subjectAlternativeNames: cnames.map((c) => `${c}.${domain}`),
+        this.certificate = new Certificate(this, 'Cert', {
+            domainName: domain,
+            subjectAlternativeNames: [`*.${domain}`],
             validation: CertificateValidation.fromDns(this.zone),
         });
     }

@@ -28,7 +28,7 @@ const apiCname = 'api';
 const certificateStack = new CertificateStack(app, 'GonzalezCertificate', {
     env,
     domain: 'gonzalesbot.com',
-    cnames: [apiCname, telegramCname, actionsCname, adminCname, assetsCname],
+    crossRegionReferences: true,
 })
 
 const databaseStack = new DatabaseStack(app, 'GonzalezDatabase');
@@ -40,4 +40,5 @@ new TelegramBotStack(app, 'GonzalezTelegram', {
     cname: telegramCname,
     certificate: certificateStack.certificate,
     zone: certificateStack.zone,
+    crossRegionReferences: true,
 });
