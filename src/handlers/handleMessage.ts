@@ -39,7 +39,7 @@ const handleMessage = async (context: Camelized<Context>) => {
     logger.info(`Found token pair: ${JSON.stringify(pair)}\n`);
 
     let tokenAccount: Account | undefined;
-    if (userKey && context.callbackQuery?.message?.chat.type === 'private') {
+    if (userKey && context.message?.chat.type === 'private') {
         // only show sell buttons if chat is private
         tokenAccount = await solanaService.getTokenAccount(pair.baseToken.address, userKey.publicKey);
     }
