@@ -12,9 +12,12 @@ const logger = new Logger({ serviceName: "handleStart" });
 const handleStart = async (context: Camelized<Context>) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
-    logger.info(`Handling start ${JSON.stringify(context, null, 2)}`);
-    const userId = context.message?.from?.id.toString();
-    if (!userId) return;
+    logger.info(`Handling start`, { context });
+    const userId = (context.message || context.callbackQuery?.message)?.from?.id.toString();
+    if (!userId) {
+        logger.error(`User id is missing from context`, { context });
+        return;
+    }
     let solanaKey = await solanaKeyService.getKey(userId);
     const solanaService = new SolanaService();
     let messageText: string;
