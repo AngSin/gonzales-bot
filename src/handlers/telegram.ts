@@ -1,8 +1,7 @@
 import {Logger} from "@aws-lambda-powertools/logger";
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import {APIGatewayProxyEventV2} from 'aws-lambda';
 import {Context} from "grammy";
 import handleStart from "./handleStart";
-import handleDecimals from "./handleDecimals";
 import {Commands} from "./types";
 import handleExport from "./handleExport";
 
