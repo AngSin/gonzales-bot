@@ -106,7 +106,11 @@ export default class SolanaService {
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
         transaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
-        const txSignature = await this.connection.sendTransaction(transaction);
+        const txSignature = await this.connection.sendTransaction(transaction, {
+            skipPreflight: false,
+            maxRetries: 2,
+            preflightCommitment: 'confirmed',
+        });
         this.logger.info(`Sent signature: `, { txSignature });
         return {
             success: true,
