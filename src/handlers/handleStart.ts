@@ -29,7 +29,7 @@ const handleStart = async (context: Camelized<Context>) => {
             `You may deposit more SOL into your account:\n\n` +
             `\`${solanaKey.publicKey}\` (tap to copy)\n\n` +
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n` +
-            `To buy a token, type its ticker symbol or CA into the chat`
+            `To buy or sell a token, type its ticker symbol or CA into the chat`
         );
         walletManagementButtons.push({ text: 'Export', callback_data: Commands.EXPORT });
         walletManagementButtons.push({ text: 'Withdraw', callback_data: Commands.EXPORT });
@@ -42,7 +42,7 @@ const handleStart = async (context: Camelized<Context>) => {
             `Deposit SOL into your account to get started:\n\n` +
             `\`${solanaKey.publicKey}\` (tap to copy)\n\n` +
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n\n` +
-            `To buy a token, type its ticker symbol or CA into the chat`
+            `To buy or sell a token, type its ticker symbol or CA into the chat`
         );
     }
     const inlineKeyboard = new InlineKeyboard()
