@@ -27,7 +27,7 @@ const handleExport = async (context: Camelized<Context>) => {
       `\`${privateKey} (tap to copy)\`\n\n` +
       `Remember! Do not share this private key with anyone`
     );
-    const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${botUsername}?start=1`);
+    const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${botUsername}?start`);
     await messagingService.sendMessage(context, messageText, inlineKeyboard);
 };
 
