@@ -3,10 +3,11 @@ import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {MessagingService} from "../services/MessagingService";
 import {botUsername} from "../services/SolanaService";
+import {Camelized} from "humps";
 
 const logger = new Logger({ serviceName: 'handleExport' });
 
-const handleExport = async (context: Context) => {
+const handleExport = async (context: Camelized<Context>) => {
     logger.info(`Handling export, context: `, { context });
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();

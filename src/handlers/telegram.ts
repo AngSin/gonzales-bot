@@ -1,6 +1,7 @@
 import {Logger} from "@aws-lambda-powertools/logger";
 import {APIGatewayProxyEventV2} from 'aws-lambda';
 import {Context} from "grammy";
+import {camelizeKeys} from 'humps';
 import handleStart from "./handleStart";
 import {Commands} from "./types";
 import handleExport from "./handleExport";
@@ -10,7 +11,7 @@ const logger = new Logger({ serviceName: 'TelegramHandler' });
 
 export const handler = async (event: APIGatewayProxyEventV2) => {
     logger.info(`Received telegram event`, { event });
-    const context = JSON.parse(event.body || '{}') as Context;
+    const context = camelizeKeys<Context>(JSON.parse(event.body || '{}'));
     if (!context.callbackQuery && !context.message) {
         logger.error(`Error, missing message & data`, { context });
         return;

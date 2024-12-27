@@ -6,10 +6,11 @@ import SolanaService from "../services/SolanaService";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {Account} from "@solana/spl-token";
+import {Camelized} from "humps";
 
 const logger = new Logger({ serviceName: 'handleMessage' });
 
-const handleMessage = async (context: Context) => {
+const handleMessage = async (context: Camelized<Context>) => {
     const messagingService = new MessagingService();
     const dexscreenerService = new DexscreenerService();
     const solanaService = new SolanaService();

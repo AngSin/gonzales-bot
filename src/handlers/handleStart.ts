@@ -5,10 +5,11 @@ import SolanaService, {botUsername} from "../services/SolanaService";
 import {MessagingService} from "../services/MessagingService";
 import {InlineKeyboardButton} from "grammy/types";
 import {Commands} from "./types";
+import {Camelized} from "humps";
 
 const logger = new Logger({ serviceName: "handleStart" });
 
-const handleStart = async (context: Context) => {
+const handleStart = async (context: Camelized<Context>) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     logger.info(`Handling start ${JSON.stringify(context, null, 2)}`);

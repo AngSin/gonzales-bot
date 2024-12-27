@@ -1,6 +1,8 @@
 import {isAddress as isEthereumAddress} from "viem";
 import {PublicKey} from "@solana/web3.js";
 import {Message} from "grammy/types";
+import {Camelized} from "humps";
+import {Context} from "grammy";
 
 const isSolanaAddress = (address:string) => {
     try {
@@ -13,12 +15,12 @@ const isSolanaAddress = (address:string) => {
 
 const splitBySpaceOrSlash = /[\s\/]+/;
 
-export const getTickerFromMessage = (message: Message): string | undefined => {
+export const getTickerFromMessage = (message: Camelized<Message>): string | undefined => {
     const words = (message.text || '').split(splitBySpaceOrSlash);
     return words.find(word => word.length > 2 && word.startsWith('$'))?.replace('$', '');
 };
 
-export const getAddressFromMessage = (message: Message): string | undefined => {
+export const getAddressFromMessage = (message: Camelized<Message>): string | undefined => {
     const words = (message.text || '').split(splitBySpaceOrSlash);
     return words.find(word => isEthereumAddress(word) || isSolanaAddress(word));
 };

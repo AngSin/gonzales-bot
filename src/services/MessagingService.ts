@@ -6,6 +6,7 @@ import {Account} from "@solana/spl-token";
 import {LAMPORTS_PER_SOL} from "@solana/web3.js";
 import axios, { AxiosInstance } from "axios";
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
+import {Camelized} from "humps";
 
 export class MessagingService {
     private axios: AxiosInstance = axios.create({
@@ -25,7 +26,7 @@ export class MessagingService {
         );
     };
 
-    async replyWithPairInfo (context: Context, pair: Pair, tokenAccount?: Account) {
+    async replyWithPairInfo (context: Camelized<Context>, pair: Pair, tokenAccount?: Account) {
         const amounts = ['.1', '.5', '1'];
         const inlineKeyboard = new InlineKeyboard();
 
@@ -52,13 +53,13 @@ export class MessagingService {
         await this.sendMessage(context, messageText, pair.chainId === 'solana' ? inlineKeyboard : undefined, true);
     };
 
-    async sendMessage(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
+    async sendMessage(context: Camelized<Context>, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await this.axios.post('sendMessage', {
             chat_id: context.message?.chat.id,
             text: this.escapeTelegramMarkup(messageText),
             reply_markup: inlineKeyboard,
             parse_mode: "Markdown",
-            reply_to: isReply ? context.message?.message_id : undefined,
+            reply_to: isReply ? context.message?.messageId : undefined,
         })
     };
 }

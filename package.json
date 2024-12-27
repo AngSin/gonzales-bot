@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.146",
+    "@types/humps": "^2.0.6",
     "@types/jest": "^29.5.14",
     "@types/node": "20.10.0",
     "@types/node-fetch": "^2.6.12",
@@ -33,6 +34,7 @@
     "constructs": "^10.0.0",
     "dotenv": "^16.4.7",
     "grammy": "^1.33.0",
+    "humps": "^2.0.1",
     "viem": "^2.21.56"
   }
 }
