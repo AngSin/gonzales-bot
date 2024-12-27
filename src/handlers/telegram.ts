@@ -4,6 +4,7 @@ import {Context} from "grammy";
 import handleStart from "./handleStart";
 import {Commands} from "./types";
 import handleExport from "./handleExport";
+import handleMessage from "./handleMessage";
 
 const logger = new Logger({ serviceName: 'TelegramHandler' });
 
@@ -22,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEventV2) => {
         case Commands.EXPORT:
             return await handleExport(context);
         default:
-            logger.error(`Unhandled message text: ${command}`);
-            return;
+            logger.info(`Text is not a command, Message text: ${command}`);
+            return await handleMessage(context);
     }
 };

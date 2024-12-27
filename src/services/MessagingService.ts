@@ -36,8 +36,8 @@ export class MessagingService {
 
         if (tokenAccount && tokenAccount.amount > 0n) {
             inlineKeyboard.add(
-                { text: 'SELL 50%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:${tokenAccount.amount/2n}` },
-                { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:${tokenAccount.amount}` }
+                { text: 'SELL 50%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:2` },
+                { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:1` }
             );
         }
         const messageText = (`✍️ ${pair.baseToken.name}\n` +
