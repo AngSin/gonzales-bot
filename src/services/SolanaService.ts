@@ -39,7 +39,7 @@ type BuySuccess = {
     amountBought: string;
 }
 
-export const botUsername = 'gonzalez_ticker_bot';
+export const botUsername = 'gonzales_ticker_bot';
 
 export default class SolanaService {
     readonly connection: Connection = new Connection(getMandatoryEnvVariable("SOLANA_RPC_URL"));

@@ -55,7 +55,8 @@ export class MessagingService {
     async sendMessage(context: Context, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         await this.axios.post('sendMessage', {
             chat_id: context.message?.chat.id,
-            text: this.escapeTelegramMarkup(messageText),
+            // text: this.escapeTelegramMarkup(messageText),
+            text: messageText,
             reply_markup: inlineKeyboard,
             parse_mode: "MarkdownV2",
             reply_to: isReply ? context.message?.message_id : undefined,
