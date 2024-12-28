@@ -113,7 +113,7 @@ export default class SolanaService {
         const txSignature = await this.connection.sendTransaction(transaction, {
             skipPreflight: false,
             maxRetries: 0,
-            preflightCommitment: 'processed',
+            preflightCommitment: 'confirmed',
         });
 
         const result = await this.connection.confirmTransaction(txSignature, 'confirmed');
