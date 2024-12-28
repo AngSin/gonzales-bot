@@ -8,6 +8,7 @@ import {Context} from "grammy";
 const logger = new Logger({ serviceName: 'handleSell' });
 
 const handleSell = async (tokenMintAddress: string, userId: string, username: string, ticker: string, divider: bigint, context: Camelized<Context>) => {
+    logger.info(`Handling sell`, { context });
     const solanaService = new SolanaService();
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
@@ -22,6 +23,10 @@ const handleSell = async (tokenMintAddress: string, userId: string, username: st
         return;
     }
     const amountToSell = (tokenAccount.amount/divider).toString();
+    logger.info(`Placing sell order`, {
+        amountToSell,
+        tokenAccount,
+    });
     await solanaService.tradeSolanaAsset(tokenMintAddress, amountToSell, userKey, true);
     const percentageSold = ((tokenAccount.amount/divider)/tokenAccount.amount).toLocaleString(undefined, {
         maximumFractionDigits: 0,

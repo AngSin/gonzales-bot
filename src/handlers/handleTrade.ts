@@ -15,7 +15,7 @@ const handleTrade = async (context: Camelized<Context>) => {
     const callbackData = context.callbackQuery.data;
     const userId = context.callbackQuery.from.id.toString();
     const username = String(context.callbackQuery.from.username);
-    console.log(`Received trade data: ${callbackData} from user ${username} with user id ${userId}`);
+    logger.info(`Received trade data: ${callbackData} from user ${username} with user id ${userId}`);
 
     const tradeData = callbackData.split(':');
     const [direction, tokenAddress, ticker, num] = tradeData;
