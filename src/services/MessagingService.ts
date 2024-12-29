@@ -77,6 +77,14 @@ export class MessagingService {
     };
 
     async sendMessage(context: Camelized<Context>, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
+        const payload = {
+            chatId: (context.message || context.callbackQuery?.message)?.chat.id,
+            text: this.escapeTelegramMarkup(messageText),
+            replyMarkup: inlineKeyboard,
+            parseMode: "Markdown",
+            replyTo: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
+        };
+        this.logger.info('Sending TG Message', { payload })
         await this.axios.post('sendMessage', decamelizeKeys({
             chatId: (context.message || context.callbackQuery?.message)?.chat.id,
             text: this.escapeTelegramMarkup(messageText),
