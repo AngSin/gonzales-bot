@@ -49,7 +49,7 @@ export class MessagingService {
 
         inlineKeyboard.add(...amounts.map(amount => ({
             text: `BUY ${amount} SOL`,
-            callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol}:${Number(amount) * LAMPORTS_PER_SOL}`,
+            callback_data: `buy:${pair.baseToken.address}:${pair.baseToken.symbol.trim()}:${Number(amount) * LAMPORTS_PER_SOL}`,
         })));
 
         if (tokenAccount && tokenAccount.amount > 0n) {
