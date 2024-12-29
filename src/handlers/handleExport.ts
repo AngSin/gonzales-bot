@@ -4,6 +4,7 @@ import {SolanaKeyService} from "../services/SolanaKeyService";
 import {MessagingService} from "../services/MessagingService";
 import {botUsername} from "../services/SolanaService";
 import {Camelized} from "humps";
+import {Commands} from "./types";
 
 const logger = new Logger({ serviceName: 'handleExport' });
 
@@ -27,7 +28,7 @@ const handleExport = async (context: Camelized<Context>) => {
       `\`${privateKey}\` (tap to copy)\n\n` +
       `Remember! Do not share this private key with anyone`
     );
-    const inlineKeyboard = new InlineKeyboard().url('Refresh', `https://t.me/${botUsername}?start`);
+    const inlineKeyboard = new InlineKeyboard().text('Refresh',Commands.START);
     await messagingService.sendMessage(context, messageText, inlineKeyboard);
 };
 
