@@ -119,33 +119,34 @@ export default class SolanaService {
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
         const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
+        // const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
         const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
         this.logger.info(`Received latest blockhash ${blockhash}`);
         const trader = new PublicKey(userKey.publicKey);
-        const amountInLamports = BigInt(isSell ? quoteResponse.outAmount : amountInSmallestUnits);
-        const fees = this.calculateFees(amountInLamports);
-        this.logger.info(`Amount in lamports is: ${amountInLamports}, calculated fees is: ${fees}`);
-        const transferFeesInstruction = SystemProgram.transfer({
-            fromPubkey: trader,
-            toPubkey: this.treasuryAccount,
-            lamports: fees,
-        });
-        const messageV0 = new TransactionMessage({
-            payerKey: trader,
-            recentBlockhash: blockhash,
-            instructions: [
-                ...jupiterInstructions,
-                transferFeesInstruction,
-            ],
-        }).compileToV0Message();
-        const versionedTransaction = new VersionedTransaction(messageV0);
-        const message = Buffer.from(messageV0.serialize()).toString('base64');
+        // const amountInLamports = BigInt(isSell ? quoteResponse.outAmount : amountInSmallestUnits);
+        // const fees = this.calculateFees(amountInLamports);
+        // this.logger.info(`Amount in lamports is: ${amountInLamports}, calculated fees is: ${fees}`);
+        // const transferFeesInstruction = SystemProgram.transfer({
+        //     fromPubkey: trader,
+        //     toPubkey: this.treasuryAccount,
+        //     lamports: fees,
+        // });
+        // const messageV0 = new TransactionMessage({
+        //     payerKey: trader,
+        //     recentBlockhash: blockhash,
+        //     instructions: [
+        //         ...jupiterInstructions,
+        //         transferFeesInstruction,
+        //     ],
+        // }).compileToV0Message();
+        // const versionedTransaction = new VersionedTransaction(messageV0);
+        // const message = Buffer.from(messageV0.serialize()).toString('base64');
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        this.logger.info(`Serialised message: `, { message });
-        versionedTransaction.sign([wallet]);
-        this.logger.info(`Signed transaction: `, { signatures: versionedTransaction.signatures });
-        const txSignature = await this.connection.sendTransaction(versionedTransaction, {
+        this.logger.info(`Serialised message: `, { message: jupiterTransaction.message });
+        jupiterTransaction.sign([wallet]);
+        // versionedTransaction.sign([wallet]);
+        this.logger.info(`Signed transaction: `, { signatures: jupiterTransaction.signatures });
+        const txSignature = await this.connection.sendTransaction(jupiterTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'confirmed',
