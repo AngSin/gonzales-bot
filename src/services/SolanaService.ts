@@ -158,15 +158,15 @@ export default class SolanaService {
 
         this.logger.info(`Transaction sent: ${txHash}`);
 
-        const result = await this.connection.confirmTransaction(
-            {
-                blockhash,
-                lastValidBlockHeight,
-                signature: bs58.encode(jupiterTransaction.signatures[0]),
-            },
-            'confirmed'
-        );
-        this.logger.info(`Sent signature: `, { assetAddress, amountInSmallestUnits, result });
+        // const result = await this.connection.confirmTransaction(
+        //     {
+        //         blockhash,
+        //         lastValidBlockHeight,
+        //         signature: bs58.encode(jupiterTransaction.signatures[0]),
+        //     },
+        //     'confirmed'
+        // );
+        // this.logger.info(`Sent signature: `, { assetAddress, amountInSmallestUnits, result });
         // await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
         // this.logger.info(`Waiting 2 seconds finished`);
         return {
