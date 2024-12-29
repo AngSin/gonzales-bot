@@ -150,11 +150,13 @@ export default class SolanaService {
         jupiterTransaction.sign([wallet]);
         // versionedTransaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { signatures: jupiterTransaction.signatures });
-        await this.connection.sendTransaction(jupiterTransaction, {
+        const txHash = await this.connection.sendTransaction(jupiterTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'confirmed',
         });
+
+        this.logger.info(`Transaction sent: ${txHash}`);
 
         const result = await this.connection.confirmTransaction(
             {
