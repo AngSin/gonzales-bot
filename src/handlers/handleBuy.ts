@@ -37,7 +37,7 @@ const handleBuy = async (context: Camelized<Context>, assetAddress: string, user
         logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
         const purchase = await solanaService.tradeSolanaAsset(assetAddress, amountInLamports, solanaKey);
         if (purchase.success) {
-            logger.debug(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.callbackQuery?.message?.chat?.type}`);
+            logger.info(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.callbackQuery?.message?.chat?.type}`);
             await messagingService.sendMessage(context, `${context.callbackQuery?.from?.firstName} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat
         } else {
             await handlePurchaseError(purchase.error, context);

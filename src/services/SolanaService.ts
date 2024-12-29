@@ -95,7 +95,10 @@ export default class SolanaService {
             this.logger.info(`Buying ${amountInSmallestUnits} lamps of ${assetAddress}`);
         }
         const solBalance = await this.getSOLBalance(userKey.publicKey);
-        if (solBalance <= amountInSmallestUnits) {
+        if (isSell) {
+
+        } else if (solBalance <= amountInSmallestUnits) {
+            this.logger.info(`User does not have enough balance to buy`, { solBalance, amountInSmallestUnits })
             return {
                 success: false,
                 error: BuyErrorMessage.INSUFFICIENT_BALANCE,
@@ -160,7 +163,7 @@ export default class SolanaService {
             },
             'confirmed'
         );
-        this.logger.info(`Sent signature: `, { txSignature, result });
+        this.logger.info(`Sent signature: `, { assetAddress, amountInSmallestUnits, result });
         // await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
         // this.logger.info(`Waiting 2 seconds finished`);
         return {
