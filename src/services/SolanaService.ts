@@ -88,14 +88,14 @@ export default class SolanaService {
         return orderAmountInLamports / this.feeBasisPoints;
     }
 
-    async tradeSolanaAsset(assetAddress: string, amountInSmallestUnits: string, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
+    async tradeSolanaAsset(assetAddress: string, amountInSmallestUnits: number, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
         if (isSell) {
             this.logger.info(`Selling ${amountInSmallestUnits} of ${assetAddress} for SOL`);
         } else {
             this.logger.info(`Buying ${amountInSmallestUnits} lamps of ${assetAddress}`);
         }
         const solBalance = await this.getSOLBalance(userKey.publicKey);
-        if (solBalance <= Number(amountInSmallestUnits)) {
+        if (solBalance <= amountInSmallestUnits) {
             return {
                 success: false,
                 error: BuyErrorMessage.INSUFFICIENT_BALANCE,

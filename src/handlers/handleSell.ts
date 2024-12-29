@@ -22,7 +22,7 @@ const handleSell = async (tokenMintAddress: string, userId: string, username: st
         logger.error(`No token account exists for user ${userId} (${username}), ending execution`);
         return;
     }
-    const amountToSell = (tokenAccount.amount/divider).toString();
+    const amountToSell = Number(tokenAccount.amount/divider);
     logger.info(`Placing sell order`, {
         amountToSell,
         tokenAccount,

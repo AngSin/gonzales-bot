@@ -27,7 +27,7 @@ const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Ca
     }
 }
 
-const handleBuy = async (context: Camelized<Context>, assetAddress: string, userId: string, symbol: string, amountInLamports: string) => {
+const handleBuy = async (context: Camelized<Context>, assetAddress: string, userId: string, symbol: string, amountInLamports: number) => {
     const solanaKeyService = new SolanaKeyService();
     const solanaService = new SolanaService();
 

@@ -4,6 +4,7 @@ import {Commands} from "./types";
 import {Logger} from "@aws-lambda-powertools/logger";
 import handleBuy from "./handleBuy";
 import handleSell from "./handleSell";
+import {LAMPORTS_PER_SOL} from "@solana/web3.js";
 
 const logger = new Logger({ serviceName: 'handleTrade' });
 
@@ -26,7 +27,7 @@ const handleTrade = async (context: Camelized<Context>) => {
     }
 
     if (direction === 'buy') {
-        const amountInLamports = num; // renamed for code legibility
+        const amountInLamports = Number(num) * LAMPORTS_PER_SOL; // renamed for code legibility
         return await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
     } else {
         const divider = BigInt(num);
