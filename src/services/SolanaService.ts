@@ -122,53 +122,21 @@ export default class SolanaService {
         });
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
-        const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        // const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
-        const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
-        this.logger.info(`Received latest blockhash ${blockhash}`);
-        const trader = new PublicKey(userKey.publicKey);
-        // const amountInLamports = BigInt(isSell ? quoteResponse.outAmount : amountInSmallestUnits);
-        // const fees = this.calculateFees(amountInLamports);
-        // this.logger.info(`Amount in lamports is: ${amountInLamports}, calculated fees is: ${fees}`);
-        // const transferFeesInstruction = SystemProgram.transfer({
-        //     fromPubkey: trader,
-        //     toPubkey: this.treasuryAccount,
-        //     lamports: fees,
-        // });
-        // const messageV0 = new TransactionMessage({
-        //     payerKey: trader,
-        //     recentBlockhash: blockhash,
-        //     instructions: [
-        //         ...jupiterInstructions,
-        //         transferFeesInstruction,
-        //     ],
-        // }).compileToV0Message();
-        // const versionedTransaction = new VersionedTransaction(messageV0);
-        // const message = Buffer.from(messageV0.serialize()).toString('base64');
+        const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+        this.logger.info(`Serialised transaction: `, { transaction });
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        this.logger.info(`Serialised message: `, { message: jupiterTransaction.message });
-        jupiterTransaction.sign([wallet]);
-        // versionedTransaction.sign([wallet]);
-        this.logger.info(`Signed transaction: `, { signatures: jupiterTransaction.signatures });
-        const txHash = await this.connection.sendTransaction(jupiterTransaction, {
+        transaction.sign([wallet]);
+        this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
+        const txSignature = await this.connection.sendTransaction(transaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'confirmed',
         });
 
-        this.logger.info(`Transaction sent: ${txHash}`);
-
-        // const result = await this.connection.confirmTransaction(
-        //     {
-        //         blockhash,
-        //         lastValidBlockHeight,
-        //         signature: bs58.encode(jupiterTransaction.signatures[0]),
-        //     },
-        //     'confirmed'
-        // );
-        // this.logger.info(`Sent signature: `, { assetAddress, amountInSmallestUnits, result });
-        // await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
-        // this.logger.info(`Waiting 2 seconds finished`);
+        // const result = await this.connection.confirmTransaction(txSignature, 'confirmed');
+        this.logger.info(`Sent signature: `, { txSignature });
+        await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
+        this.logger.info(`Waiting 2 seconds finished`);
         return {
             success: true,
             amountBought: quoteResponse.outAmount,
