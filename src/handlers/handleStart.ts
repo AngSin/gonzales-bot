@@ -13,7 +13,7 @@ const handleStart = async (context: Camelized<Context>) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     logger.info(`Handling start`, { context });
-    const userId = (context.message || context.callbackQuery?.message)?.from?.id.toString();
+    const userId = context.callbackQuery?.from?.id.toString();
     if (!userId) {
         logger.error(`User id is missing from context`, { context });
         return;
