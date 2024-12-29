@@ -6,6 +6,7 @@ import {
     PublicKey, SystemProgram, TransactionMessage,
     VersionedTransaction
 } from "@solana/web3.js";
+import bs58 from 'bs58';
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
@@ -149,7 +150,7 @@ export default class SolanaService {
         jupiterTransaction.sign([wallet]);
         // versionedTransaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { signatures: jupiterTransaction.signatures });
-        const txSignature = await this.connection.sendTransaction(jupiterTransaction, {
+        await this.connection.sendTransaction(jupiterTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'confirmed',
@@ -159,7 +160,7 @@ export default class SolanaService {
             {
                 blockhash,
                 lastValidBlockHeight,
-                signature: 'versionedTransaction.signatures[0]'
+                signature: bs58.encode(jupiterTransaction.signatures[0]),
             },
             'confirmed'
         );

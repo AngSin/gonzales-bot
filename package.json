@@ -31,6 +31,7 @@
     "aws-cdk-lib": "2.173.2",
     "aws-lambda": "^1.0.7",
     "axios": "^1.7.9",
+    "bs58": "^6.0.0",
     "constructs": "^10.0.0",
     "dotenv": "^16.4.7",
     "grammy": "^1.33.0",
