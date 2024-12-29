@@ -1,4 +1,11 @@
-import {Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, VersionedTransaction} from "@solana/web3.js";
+import {
+    ComputeBudgetProgram,
+    Connection,
+    Keypair,
+    LAMPORTS_PER_SOL,
+    PublicKey, SystemProgram, TransactionMessage,
+    VersionedTransaction
+} from "@solana/web3.js";
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import axios, {AxiosInstance} from "axios";
 import {Logger} from "@aws-lambda-powertools/logger";
@@ -42,6 +49,8 @@ type BuySuccess = {
 export const botUsername = 'gonzales_ticker_bot';
 
 export default class SolanaService {
+    private readonly feeBasisPoints = 100n;
+    private readonly treasuryAccount: PublicKey = new PublicKey('ABMHApyZu8DfuaGoKoLk4yRHFsvzHwsEsGZXKsJ19FBX');
     readonly connection: Connection = new Connection(getMandatoryEnvVariable("SOLANA_RPC_URL"));
     readonly jupiterAxios: AxiosInstance = axios.create({
         baseURL: "https://quote-api.jup.ag/v6/",
@@ -75,14 +84,18 @@ export default class SolanaService {
         });
     }
 
-    async tradeSolanaAsset(assetAddress: string, amountInLamports: string, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
+    private calculateFees(orderAmountInLamports: bigint): bigint {
+        return orderAmountInLamports / this.feeBasisPoints;
+    }
+
+    async tradeSolanaAsset(assetAddress: string, amountInSmallestUnits: string, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
         if (isSell) {
-            this.logger.info(`Selling ${amountInLamports} of ${assetAddress} for SOL`);
+            this.logger.info(`Selling ${amountInSmallestUnits} of ${assetAddress} for SOL`);
         } else {
-            this.logger.info(`Buying ${amountInLamports} lamps of ${assetAddress}`);
+            this.logger.info(`Buying ${amountInSmallestUnits} lamps of ${assetAddress}`);
         }
         const solBalance = await this.getSOLBalance(userKey.publicKey);
-        if (solBalance <= Number(amountInLamports)) {
+        if (solBalance <= Number(amountInSmallestUnits)) {
             return {
                 success: false,
                 error: BuyErrorMessage.INSUFFICIENT_BALANCE,
@@ -92,7 +105,7 @@ export default class SolanaService {
             params: {
                 inputMint: isSell ? assetAddress : NATIVE_MINT,
                 outputMint: isSell ? NATIVE_MINT : assetAddress,
-                amount: amountInLamports,
+                amount: amountInSmallestUnits,
                 autoSlippage: true,
                 maxAutoSlippageBps: 1_000, // 10%
             }
@@ -105,21 +118,50 @@ export default class SolanaService {
         });
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
-        const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        this.logger.info(`Serialised transaction: `, { transaction });
+        const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
+        const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
+        const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
+        this.logger.info(`Received latest blockhash ${blockhash}`);
+        const trader = new PublicKey(userKey.publicKey);
+        const amountInLamports = BigInt(isSell ? quoteResponse.outAmount : amountInSmallestUnits);
+        const fees = this.calculateFees(amountInLamports);
+        this.logger.info(`Amount in lamports is: ${amountInLamports}, calculated fees is: ${fees}`);
+        const transferFeesInstruction = SystemProgram.transfer({
+            fromPubkey: trader,
+            toPubkey: this.treasuryAccount,
+            lamports: fees,
+        });
+        const messageV0 = new TransactionMessage({
+            payerKey: trader,
+            recentBlockhash: blockhash,
+            instructions: [
+                ...jupiterInstructions,
+                transferFeesInstruction,
+            ],
+        }).compileToV0Message();
+        const versionedTransaction = new VersionedTransaction(messageV0);
+        const message = Buffer.from(messageV0.serialize()).toString('base64');
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        transaction.sign([wallet]);
-        this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
-        const txSignature = await this.connection.sendTransaction(transaction, {
+        this.logger.info(`Serialised message: `, { message });
+        versionedTransaction.sign([wallet]);
+        this.logger.info(`Signed transaction: `, { signatures: versionedTransaction.signatures });
+        const txSignature = await this.connection.sendTransaction(versionedTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'confirmed',
         });
 
-        // const result = await this.connection.confirmTransaction(txSignature, 'confirmed');
-        this.logger.info(`Sent signature: `, { txSignature });
-        await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
-        this.logger.info(`Waiting 2 seconds finished`);
+        const result = await this.connection.confirmTransaction(
+            {
+                blockhash,
+                lastValidBlockHeight,
+                signature: 'versionedTransaction.signatures[0]'
+            },
+            'confirmed'
+        );
+        this.logger.info(`Sent signature: `, { txSignature, result });
+        // await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
+        // this.logger.info(`Waiting 2 seconds finished`);
         return {
             success: true,
             amountBought: quoteResponse.outAmount,
