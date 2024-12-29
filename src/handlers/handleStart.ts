@@ -34,7 +34,7 @@ const handleStart = async (context: Camelized<Context>) => {
         walletManagementButtons.push({ text: 'Export', callback_data: Commands.EXPORT });
         walletManagementButtons.push({ text: 'Withdraw', callback_data: Commands.EXPORT });
     } else {
-        logger.info(`No Solana key exists for user ${context.message?.from.username} with id: ${userId}`);
+        logger.info(`No Solana key exists for user ${context.callbackQuery?.from?.username} with id: ${userId}`, { context });
         solanaKey = await solanaKeyService.generateNewKey(userId);
         logger.info(`Created solana key ${solanaKey.publicKey} for user ${userId}`);
         messageText = (
