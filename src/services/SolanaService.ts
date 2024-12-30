@@ -112,13 +112,25 @@ export default class SolanaService {
                 amount: amountInSmallestUnits,
                 autoSlippage: true,
                 maxAutoSlippageBps: 1_000, // 10%
+                restrictIntermediateTokens: true, // if your route is routed through random intermediate tokens, it will fail more frequently
             }
         });
         this.logger.info(`Received quotes response: `, { quoteResponse });
         const swapResponse = await this.jupiterAxios.post<JupiterSwapResponse>("swap", {
             quoteResponse,
             userPublicKey: userKey.publicKey,
+            dynamicComputeUnitLimit: true,
+            dynamicSlippage: {
+                maxBps: 1_000 // 10% - crazy high
+            },
             wrapAndUnwrapSol: true,
+            prioritizationFeeLamports: {
+                priorityLevelWithMaxLamports: {
+                    maxLamports: 10_000_000, // 0.1 SOL
+                    global: false,
+                    priorityLevel: "veryHigh"
+                }
+            }
         });
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
