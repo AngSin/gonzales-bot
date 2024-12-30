@@ -3,10 +3,10 @@ import {Context, InlineKeyboard} from "grammy";
 import {capitalize, displayHumanFriendlyNumber} from "../utils/string";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {Account} from "@solana/spl-token";
-import {LAMPORTS_PER_SOL} from "@solana/web3.js";
-import axios, { AxiosInstance } from "axios";
+import axios, {AxiosInstance} from "axios";
 import {getMandatoryEnvVariable} from "../utils/getMandatoryEnvVariable";
 import {Camelized, decamelizeKeys} from "humps";
+import {sellPercentages} from "../utils/percentages";
 
 export class MessagingService {
     private axios: AxiosInstance = axios.create({
@@ -54,10 +54,9 @@ export class MessagingService {
 
         if (tokenAccount && tokenAccount.amount > 0n) {
             inlineKeyboard.row();
-            inlineKeyboard.row(
-                { text: 'SELL 50%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:2` },
-                { text: 'SELL 100%', callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:1` }
-            );
+            inlineKeyboard.row(...sellPercentages.map(percentage => ({
+                text: `SELL ${percentage}`, callback_data: `sell:${pair.baseToken.address}:${pair.baseToken.symbol}:${percentage}`
+            })));
         }
 
         const messageText = (

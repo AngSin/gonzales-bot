@@ -5,6 +5,7 @@ import {Logger} from "@aws-lambda-powertools/logger";
 import handleBuy from "./handleBuy";
 import handleSell from "./handleSell";
 import {LAMPORTS_PER_SOL} from "@solana/web3.js";
+import {getDividerFromPercentage} from "../utils/percentages";
 
 const logger = new Logger({ serviceName: 'handleTrade' });
 
@@ -19,7 +20,7 @@ const handleTrade = async (context: Camelized<Context>) => {
     logger.info(`Received trade data: ${callbackData} from user ${username} with user id ${userId}`);
 
     const tradeData = callbackData.split(':');
-    const [direction, tokenAddress, ticker, num] = tradeData;
+    const [direction, tokenAddress, ticker, amount] = tradeData;
 
     if (tradeData.length < 4) {
         logger.error(`Missing trade data!`, { tradeData });
@@ -27,11 +28,12 @@ const handleTrade = async (context: Camelized<Context>) => {
     }
 
     if (direction === 'buy') {
-        const amountInLamports = Number(num) * LAMPORTS_PER_SOL; // renamed for code legibility
+        const amountInLamports = Number(amount) * LAMPORTS_PER_SOL; // renamed for code legibility
         return await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
     } else {
-        const divider = BigInt(num);
-        return await handleSell(tokenAddress, userId, username, ticker, divider, context);
+        const sellPercentage = amount;
+        const divider = getDividerFromPercentage(sellPercentage);
+        return await handleSell(tokenAddress, userId, username, ticker, divider, sellPercentage, context);
     }
 };
 
