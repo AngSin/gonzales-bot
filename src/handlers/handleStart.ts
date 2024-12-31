@@ -1,7 +1,7 @@
 import {Context, InlineKeyboard} from "grammy";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {SolanaKeyService} from "../services/SolanaKeyService";
-import SolanaService, {botUsername} from "../services/SolanaService";
+import SolanaService from "../services/SolanaService";
 import {MessagingService} from "../services/MessagingService";
 import {InlineKeyboardButton} from "grammy/types";
 import {Commands} from "./types";
@@ -13,7 +13,7 @@ const handleStart = async (context: Camelized<Context>) => {
     const solanaKeyService = new SolanaKeyService();
     const messagingService = new MessagingService();
     logger.info(`Handling start`, { context });
-    const userId = context.callbackQuery?.from?.id.toString();
+    const userId = (context.callbackQuery || context.message)?.from?.id.toString(); // may be a message or callback
     if (!userId) {
         logger.error(`User id is missing from context`, { context });
         return;
@@ -34,7 +34,7 @@ const handleStart = async (context: Camelized<Context>) => {
         walletManagementButtons.push({ text: 'Export', callback_data: Commands.EXPORT });
         walletManagementButtons.push({ text: 'Withdraw', callback_data: Commands.EXPORT });
     } else {
-        logger.info(`No Solana key exists for user ${context.callbackQuery?.from?.username} with id: ${userId}`, { context });
+        logger.info(`No Solana key exists for user ${(context.callbackQuery || context?.message)?.from?.username} with id: ${userId}`, { context });
         solanaKey = await solanaKeyService.generateNewKey(userId);
         logger.info(`Created solana key ${solanaKey.publicKey} for user ${userId}`);
         messageText = (
