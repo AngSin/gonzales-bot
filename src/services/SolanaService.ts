@@ -161,7 +161,7 @@ export default class SolanaService {
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
         const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
+        // const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
         const { blockhash } = await this.connection.getLatestBlockhash();
         this.logger.info(`Received latest blockhash ${blockhash}`);
         const trader = new PublicKey(userKey.publicKey);
@@ -177,14 +177,14 @@ export default class SolanaService {
             payerKey: trader,
             recentBlockhash: blockhash,
             instructions: [
-                ...jupiterInstructions,
+                // ...jupiterInstructions,
                 transferFeesInstruction,
             ],
         }).compileToV0Message();
         const versionedTransaction = new VersionedTransaction(messageV0);
         this.logger.info(`Serialised transaction: `, { transaction: versionedTransaction.serialize() });
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        versionedTransaction.sign([wallet]);
+        jupiterTransaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { assetAddress, amountInSmallestUnits, isSell });
         const txSignature = await this.connection.sendTransaction(jupiterTransaction, {
             skipPreflight: false,
