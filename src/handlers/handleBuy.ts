@@ -2,15 +2,15 @@ import {Context, InlineKeyboard} from "grammy";
 import {SolanaKeyService} from "../services/SolanaKeyService";
 import {Logger} from "@aws-lambda-powertools/logger";
 import {MessagingService} from "../services/MessagingService";
-import SolanaService, {botUsername, BuyErrorMessage} from "../services/SolanaService";
+import SolanaService, {botUsername, TradeErrorMessage} from "../services/SolanaService";
 import {Camelized} from "humps";
 
 const logger = new Logger({ serviceName: 'handleBuy' });
 const messagingService = new MessagingService();
 
-const handlePurchaseError = async (buyErrorMessage: BuyErrorMessage, context: Camelized<Context>) => {
+const handlePurchaseError = async (buyErrorMessage: TradeErrorMessage, context: Camelized<Context>) => {
     switch (buyErrorMessage) {
-        case BuyErrorMessage.INSUFFICIENT_BALANCE:
+        case TradeErrorMessage.INSUFFICIENT_BALANCE:
             if (context.callbackQuery?.message?.chat?.type === 'private') {
                 await messagingService.sendMessage(context, "You do not have enough SOL balance for the purchase!");
             } else {
@@ -31,11 +31,11 @@ const handleBuy = async (context: Camelized<Context>, assetAddress: string, user
     const solanaKeyService = new SolanaKeyService();
     const solanaService = new SolanaService();
 
-    const solanaKey = await solanaKeyService.getKey(userId);
+    const userKey = await solanaKeyService.getKey(userId);
 
-    if (solanaKey) {
-        logger.info(`Found wallet ${solanaKey.publicKey} for user ${userId}`);
-        const purchase = await solanaService.tradeSolanaAsset(assetAddress, amountInLamports, solanaKey);
+    if (userKey) {
+        logger.info(`Found wallet ${userKey.publicKey} for user ${userId}`);
+        const purchase = await solanaService.tradeSolanaAsset({ assetAddress, amountInSmallestUnits: amountInLamports, userKey });
         if (purchase.success) {
             logger.info(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.callbackQuery?.message?.chat?.type}`);
             await messagingService.sendMessage(context, `${context.callbackQuery?.from?.firstName} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat

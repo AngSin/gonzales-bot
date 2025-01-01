@@ -13,6 +13,24 @@ import {Logger} from "@aws-lambda-powertools/logger";
 import {Account, getAccount, getAssociatedTokenAddressSync, getMint, NATIVE_MINT} from "@solana/spl-token";
 import {Key} from "../types";
 
+type SolanaBuyInput = {
+    assetAddress: string;
+    amountInSmallestUnits: number;
+    userKey: Key;
+};
+
+type SolanaSellInput = {
+    assetAddress: string;
+    amountInSmallestUnits: number;
+    userKey: Key;
+    tokenAccount: Account;
+};
+
+type SolanaTradeInput = SolanaBuyInput | SolanaSellInput;
+
+const isSellInput = (input: SolanaTradeInput): input is SolanaSellInput =>
+    (input as SolanaSellInput).tokenAccount !== undefined;
+
 type SwapMode = "ExactIn" | "ExactOut";
 
 type JupiterQuotesResponse = {
@@ -31,7 +49,7 @@ type JupiterSwapResponse = {
     swapTransaction: string;
 }
 
-export enum BuyErrorMessage {
+export enum TradeErrorMessage {
     INSUFFICIENT_BALANCE
 }
 
@@ -39,7 +57,7 @@ type BuyResponse = BuyError | BuySuccess;
 
 type BuyError = {
     success: false;
-    error: BuyErrorMessage;
+    error: TradeErrorMessage;
 }
 
 type BuySuccess = {
@@ -62,7 +80,7 @@ export default class SolanaService {
         const balanceInLamports = await this.connection.getBalance(new PublicKey(pubkey));
         this.logger.info(`Found balance for user ${pubkey}: ${balanceInLamports} lamports`);
         return balanceInLamports
-    }
+    };
 
     async getHumanFriendlySOLBalance(pubkey: string): Promise<string> {
         const balanceInLamports = await this.getSOLBalance(pubkey);
@@ -71,8 +89,7 @@ export default class SolanaService {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
-    }
-
+    };
 
     async getHumanFriendlyTokenBalance(tokenAddress: string, tokenAmount: string): Promise<string> {
         const tokenMintPubkey = new PublicKey(tokenAddress);
@@ -83,13 +100,15 @@ export default class SolanaService {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
-    }
+    };
 
     private calculateFees(orderAmountInLamports: bigint): bigint {
         return orderAmountInLamports / this.feeBasisPoints;
-    }
+    };
 
-    async tradeSolanaAsset(assetAddress: string, amountInSmallestUnits: number, userKey: Key, isSell?: boolean): Promise<BuyResponse> {
+    async tradeSolanaAsset(tradeInput: SolanaTradeInput): Promise<BuyResponse> {
+        const isSell = isSellInput(tradeInput);
+        const { amountInSmallestUnits, assetAddress, userKey } = tradeInput;
         if (isSell) {
             this.logger.info(`Selling ${amountInSmallestUnits} of ${assetAddress} for SOL`);
         } else {
@@ -97,12 +116,19 @@ export default class SolanaService {
         }
         const solBalance = await this.getSOLBalance(userKey.publicKey);
         if (isSell) {
-
+            // theoretically this should never happen as the user is clicking on "SELL 50% or SELL 100%" etc buttons
+            if (tradeInput.tokenAccount.amount < amountInSmallestUnits) {
+                this.logger.info(`User does not have enough of the asset to sell`, { tokenAccount: tradeInput.tokenAccount, amountInSmallestUnits });
+                return {
+                    success: false,
+                    error: TradeErrorMessage.INSUFFICIENT_BALANCE,
+                };
+            }
         } else if (solBalance <= amountInSmallestUnits) {
             this.logger.info(`User does not have enough balance to buy`, { solBalance, amountInSmallestUnits })
             return {
                 success: false,
-                error: BuyErrorMessage.INSUFFICIENT_BALANCE,
+                error: TradeErrorMessage.INSUFFICIENT_BALANCE,
             }
         }
         const { data: quoteResponse } = await this.jupiterAxios.get<JupiterQuotesResponse>("quote", {
@@ -126,7 +152,7 @@ export default class SolanaService {
             wrapAndUnwrapSol: true,
             prioritizationFeeLamports: {
                 priorityLevelWithMaxLamports: {
-                    maxLamports: 10_000_000, // 0.1 SOL
+                    maxLamports: 10_000_000, // 0.01 SOL
                     global: false,
                     priorityLevel: "veryHigh"
                 }
@@ -134,12 +160,33 @@ export default class SolanaService {
         });
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
-        const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        this.logger.info(`Serialised transaction: `, { transaction });
+        const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
+        const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
+        const { blockhash } = await this.connection.getLatestBlockhash();
+        this.logger.info(`Received latest blockhash ${blockhash}`);
+        const trader = new PublicKey(userKey.publicKey);
+        const amountInLamports = BigInt(isSell ? quoteResponse.outAmount : amountInSmallestUnits);
+        const fees = this.calculateFees(amountInLamports);
+        this.logger.info(`Amount in lamports is: ${amountInLamports}, calculated fees is: ${fees}`);
+        const transferFeesInstruction = SystemProgram.transfer({
+            fromPubkey: trader,
+            toPubkey: this.treasuryAccount,
+            lamports: fees,
+        });
+        const messageV0 = new TransactionMessage({
+            payerKey: trader,
+            recentBlockhash: blockhash,
+            instructions: [
+                ...jupiterInstructions,
+                transferFeesInstruction,
+            ],
+        }).compileToV0Message();
+        const versionedTransaction = new VersionedTransaction(messageV0);
+        this.logger.info(`Serialised transaction: `, { transaction: versionedTransaction.serialize() });
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        transaction.sign([wallet]);
-        this.logger.info(`Signed transaction: `, { signatures: transaction.signatures });
-        const txSignature = await this.connection.sendTransaction(transaction, {
+        versionedTransaction.sign([wallet]);
+        this.logger.info(`Signed transaction: `, { assetAddress, amountInSmallestUnits, isSell });
+        const txSignature = await this.connection.sendTransaction(jupiterTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'processed',

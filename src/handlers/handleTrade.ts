@@ -1,6 +1,5 @@
 import {Camelized} from "humps";
 import {Context} from "grammy";
-import {Commands} from "./types";
 import {Logger} from "@aws-lambda-powertools/logger";
 import handleBuy from "./handleBuy";
 import handleSell from "./handleSell";

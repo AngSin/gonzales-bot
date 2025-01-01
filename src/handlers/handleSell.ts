@@ -27,7 +27,12 @@ const handleSell = async (tokenMintAddress: string, userId: string, username: st
         amountToSell,
         tokenAccount,
     });
-    await solanaService.tradeSolanaAsset(tokenMintAddress, amountToSell, userKey, true);
+    await solanaService.tradeSolanaAsset({
+        tokenAccount,
+        assetAddress: tokenMintAddress,
+        amountInSmallestUnits: amountToSell,
+        userKey,
+    });
     const messageText = `You sold ${sellPercentage}% of your ${ticker} holdings!`;
     await messagingService.sendMessage(context, messageText);
 };
