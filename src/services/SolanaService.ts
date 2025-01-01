@@ -147,12 +147,12 @@ export default class SolanaService {
             userPublicKey: userKey.publicKey,
             dynamicComputeUnitLimit: true,
             dynamicSlippage: {
-                maxBps: 1_000 // 10% - crazy high
+                maxBps: 1_000 // 10% - crazy high, just to make sure that there are no tx failures
             },
             wrapAndUnwrapSol: true,
             prioritizationFeeLamports: {
                 priorityLevelWithMaxLamports: {
-                    maxLamports: 10_000_000, // 0.01 SOL
+                    maxLamports: 5_000_000, // 0.005 SOL
                     global: false,
                     priorityLevel: "veryHigh"
                 }
@@ -195,8 +195,6 @@ export default class SolanaService {
         );
 
         this.logger.info(`Sent both transactions: Fees: ${signatures[0]}, Swap: ${signatures[1]}`);
-        // await new Promise(resolve => setTimeout(resolve, 2_000)); // wait 1 second to see what happens with the transaction
-        // this.logger.info(`Waiting 2 seconds finished`);
         return {
             success: true,
             amountBought: quoteResponse.outAmount,
