@@ -161,7 +161,27 @@ export default class SolanaService {
         this.logger.info(`Received Jupiter Swap Response: `, { response: swapResponse.data });
         const swapTransactionBuf = Buffer.from(swapResponse.data.swapTransaction, 'base64');
         const jupiterTransaction = VersionedTransaction.deserialize(swapTransactionBuf);
-        // const jupiterInstructions = TransactionMessage.decompile(jupiterTransaction.message).instructions;
+        const lookupTableAddresses = jupiterTransaction.message.addressTableLookups.map(
+            (lookup) => lookup.accountKey
+        );
+
+        const lookupTableAccounts = await Promise.all(
+            lookupTableAddresses.map((address) =>
+                this.connection.getAddressLookupTable(address)
+            )
+        );
+
+        const resolvedTableAccounts = lookupTableAccounts
+            .filter((result) => result !== null)
+            .map((result) => result.value)
+            .filter(val => val !== null);
+
+        const jupiterInstructions = TransactionMessage.decompile(
+            jupiterTransaction.message,
+            {
+                addressLookupTableAccounts: resolvedTableAccounts,
+            },
+        ).instructions;
         const { blockhash } = await this.connection.getLatestBlockhash();
         this.logger.info(`Received latest blockhash ${blockhash}`);
         const trader = new PublicKey(userKey.publicKey);
@@ -177,16 +197,16 @@ export default class SolanaService {
             payerKey: trader,
             recentBlockhash: blockhash,
             instructions: [
-                // ...jupiterInstructions,
+                ...jupiterInstructions,
                 transferFeesInstruction,
             ],
         }).compileToV0Message();
         const versionedTransaction = new VersionedTransaction(messageV0);
         this.logger.info(`Serialised transaction: `, { transaction: versionedTransaction.serialize() });
         const wallet = Keypair.fromSecretKey(userKey.privateKey);
-        jupiterTransaction.sign([wallet]);
+        versionedTransaction.sign([wallet]);
         this.logger.info(`Signed transaction: `, { assetAddress, amountInSmallestUnits, isSell });
-        const txSignature = await this.connection.sendTransaction(jupiterTransaction, {
+        const txSignature = await this.connection.sendTransaction(versionedTransaction, {
             skipPreflight: false,
             maxRetries: 20,
             preflightCommitment: 'processed',
