@@ -26,13 +26,17 @@ const handleTrade = async (context: Camelized<Context>) => {
         return;
     }
 
-    if (direction === 'buy') {
-        const amountInLamports = Number(amount) * LAMPORTS_PER_SOL; // renamed for code legibility
-        return await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
-    } else {
-        const sellPercentage = amount;
-        const divider = getDividerFromPercentage(sellPercentage);
-        return await handleSell(tokenAddress, userId, username, ticker, divider, sellPercentage, context);
+    try {
+        if (direction === 'buy') {
+            const amountInLamports = Number(amount) * LAMPORTS_PER_SOL; // renamed for code legibility
+            return await handleBuy(context, tokenAddress, userId, ticker, amountInLamports);
+        } else {
+            const sellPercentage = amount;
+            const divider = getDividerFromPercentage(sellPercentage);
+            return await handleSell(tokenAddress, userId, username, ticker, divider, sellPercentage, context);
+        }
+    } catch (error) {
+        logger.error(`Error while trading`, { error });
     }
 };
 
