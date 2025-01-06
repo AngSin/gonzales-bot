@@ -18,20 +18,22 @@ const env: Environment = {
 
 const app = new cdk.App();
 
+
+const isDev = process.env.DEPLOYMENT_ENV === 'development';
+
+const telegramCname = `${isDev ? 'dev-' : ''}telegram`;
+
 const assetsCname = 'assets'
-const telegramCname = 'telegram';
 const adminCname = 'admin';
 const actionsCname = 'actions';
 const apiCname = 'api';
-
-const isDev = process.env.DEPLOYMENT_ENV === 'development';
 
 const certificateStack = new CertificateStack(app, `${isDev ? 'Dev' : ''}GonzalezCertificate`, {
     env: {
         ...env,
         region: 'us-east-1', // certificate must be in us-east-1
     },
-    domain: `${isDev ? 'dev.' : ''}gonzalesbot.com`,
+    domain: 'gonzalesbot.com',
     crossRegionReferences: true,
 })
 
