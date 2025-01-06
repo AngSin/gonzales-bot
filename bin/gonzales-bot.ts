@@ -23,6 +23,9 @@ const isDev = process.env.DEPLOYMENT_ENV === 'development';
 
 const telegramCname = `${isDev ? 'dev-' : ''}telegram`;
 
+const ethTableName = `${isDev ? 'Dev' : ''}EthKeysTable`;
+const solTableName = `${isDev ? 'Dev' : ''}SolKeysTable`;
+
 const assetsCname = 'assets'
 const adminCname = 'admin';
 const actionsCname = 'actions';
@@ -37,7 +40,10 @@ const certificateStack = new CertificateStack(app, `${isDev ? 'Dev' : ''}Gonzale
     crossRegionReferences: true,
 })
 
-const databaseStack = new DatabaseStack(app, `${isDev ? 'Dev' : ''}GonzalezDatabase`);
+const databaseStack = new DatabaseStack(app, `${isDev ? 'Dev' : ''}GonzalezDatabase`, {
+    ethTableName,
+    solTableName
+});
 
 new TelegramBotStack(app, `${isDev ? 'Dev' : ''}GonzalezTelegram`, {
     env,

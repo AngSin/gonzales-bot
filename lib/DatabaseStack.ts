@@ -1,15 +1,18 @@
+import * as cdk from 'aws-cdk-lib'
 import {Stack} from 'aws-cdk-lib'
 import {AttributeType, BillingMode, Table, TableEncryption} from 'aws-cdk-lib/aws-dynamodb'
 import {Construct} from 'constructs'
 
+interface DatabaseStackProps extends cdk.StackProps {
+    ethTableName: string;
+    solTableName: string;
+}
+
 export class DatabaseStack extends Stack {
     readonly ethKeysTable: Table;
     readonly solKeysTable: Table;
-    constructor(scope: Construct, id: string) {
+    constructor(scope: Construct, id: string, { ethTableName, solTableName }: DatabaseStackProps) {
         super(scope, id);
-
-        const ethTableName = 'EthKeysTable';
-        const solTableName = 'SolKeysTable';
 
         this.ethKeysTable = new Table(this, ethTableName, {
             tableName: ethTableName,
