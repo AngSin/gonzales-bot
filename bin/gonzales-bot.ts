@@ -11,7 +11,6 @@ const config = {
     region: getMandatoryEnvVariable('AWS_REGION'),
 }
 
-
 const env: Environment = {
     account: config.account,
     region: config.region,
@@ -25,18 +24,20 @@ const adminCname = 'admin';
 const actionsCname = 'actions';
 const apiCname = 'api';
 
-const certificateStack = new CertificateStack(app, 'GonzalezCertificate', {
+const isDev = process.env.DEPLOYMENT_ENV === 'development';
+
+const certificateStack = new CertificateStack(app, `${isDev ? 'Dev' : ''}GonzalezCertificate`, {
     env: {
         ...env,
         region: 'us-east-1', // certificate must be in us-east-1
     },
-    domain: 'gonzalesbot.com',
+    domain: `${isDev ? 'dev.' : ''}gonzalesbot.com`,
     crossRegionReferences: true,
 })
 
-const databaseStack = new DatabaseStack(app, 'GonzalezDatabase');
+const databaseStack = new DatabaseStack(app, `${isDev ? 'Dev' : ''}GonzalezDatabase`);
 
-new TelegramBotStack(app, 'GonzalezTelegram', {
+new TelegramBotStack(app, `${isDev ? 'Dev' : ''}GonzalezTelegram`, {
     env,
     ethKeysTable: databaseStack.ethKeysTable,
     solKeysTable: databaseStack.solKeysTable,

@@ -38,4 +38,5 @@ jobs:
           AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          DEPLOYMENT_ENV: "development"
         run: make deploy
