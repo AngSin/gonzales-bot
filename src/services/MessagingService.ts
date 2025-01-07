@@ -18,12 +18,9 @@ export class MessagingService {
     };
 
     private escapeTelegramMarkup(text: string): string {
-        const specialCharacters = ['_', '*', '[', ']', '~', '#', '+', '-', '|', '{', '}'];
-
-        return text.replace(
-            new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),
-            (match) => `\\${match}`
-        );
+        return text.replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
     };
 
     private wrapMessageInWarningSigns = (str: string, level: 'warning' | 'danger') => {
@@ -67,8 +64,8 @@ export class MessagingService {
             `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n` +
             `⏳ 24hr Vol: ${displayHumanFriendlyNumber(pair.volume.h24)}\n` +
             `📈 <a href="${pair.url}">Chart</a>\n\n` +
-            `       \`${pair.baseToken.address}\` (tap to copy)\n\n` +
-            `${this.getWarnings(pair)}`
+            `       <code>${pair.baseToken.address}</code> (tap to copy)\n\n` +
+            `${this.getWarnings(pair)}\n`
         );
 
         this.logger.info(`Replying to message with: ${messageText}`);
@@ -79,9 +76,9 @@ export class MessagingService {
     async sendMessage(context: Camelized<Context>, messageText: string, inlineKeyboard?: InlineKeyboard, isReply?: boolean) {
         const payload = decamelizeKeys({
             chatId: (context.message || context.callbackQuery?.message)?.chat.id,
-            text: this.escapeTelegramMarkup(messageText),
+            text: messageText,
             replyMarkup: inlineKeyboard,
-            parseMode: "Markdown",
+            parseMode: "HTML",
             replyTo: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
         });
         this.logger.info('Sending TG Message', { payload })
