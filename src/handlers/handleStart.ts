@@ -27,7 +27,7 @@ const handleStart = async (context: Camelized<Context>) => {
         messageText = (
             `Welcome back to Gonzales Bot! You previously created a wallet which currently has ${balance} SOL\n\n` +
             `You may deposit more SOL into your account:\n\n` +
-            `\`${solanaKey.publicKey}\` (tap to copy)\n\n` +
+            `<code>${solanaKey.publicKey}</code> (tap to copy)\n\n` +
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n` +
             `To buy or sell a token, type its ticker symbol or CA into the chat`
         );
@@ -40,7 +40,7 @@ const handleStart = async (context: Camelized<Context>) => {
         messageText = (
             `Welcome to Gonzales Bot! Since this is your first time using Gonzales, we have created a wallet for you\n\n` +
             `Deposit SOL into your account to get started:\n\n` +
-            `\`${solanaKey.publicKey}\` (tap to copy)\n\n` +
+            `<code>${solanaKey.publicKey}</code> (tap to copy)\n\n` +
             `Click on the "Refresh" button below to see your updated SOL balance after a deposit\n\n` +
             `To buy or sell a token, type its ticker symbol or CA into the chat`
         );

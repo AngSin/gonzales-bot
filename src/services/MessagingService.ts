@@ -17,12 +17,6 @@ export class MessagingService {
         this.logger = new Logger({ serviceName: "MessagingService"});
     };
 
-    private escapeTelegramMarkup(text: string): string {
-        return text.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    };
-
     private wrapMessageInWarningSigns = (str: string, level: 'warning' | 'danger') => {
         const emoji = level === 'danger' ? '‼️' : '⚠️';
         return `${emoji}${emoji}${emoji}️ ${str} ${emoji}${emoji}${emoji}`;
@@ -80,6 +74,7 @@ export class MessagingService {
             replyMarkup: inlineKeyboard,
             parseMode: "HTML",
             replyTo: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
+            disableWebPagePreview: true,
         });
         this.logger.info('Sending TG Message', { payload })
         await this.axios.post('sendMessage', payload);
