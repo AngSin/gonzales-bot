@@ -18,7 +18,7 @@ export class MessagingService {
     };
 
     private escapeTelegramMarkup(text: string): string {
-        const specialCharacters = ['_', '*', '[', ']', '~', '>', '#', '+', '-', '=', '|', '{', '}'];
+        const specialCharacters = ['_', '*', '[', ']', '~', '>', '#', '+', '-', '|', '{', '}'];
 
         return text.replace(
             new RegExp(`[${specialCharacters.map((c) => `\\${c}`).join('')}]`, 'g'),
@@ -65,8 +65,8 @@ export class MessagingService {
             `💹 $${pair.baseToken.symbol}\n\n` +
             `💰 $${pair.priceUsd.toLocaleString()}\n` +
             `💎 FDV: ${displayHumanFriendlyNumber(pair.fdv)}\n` +
-            `⏳ 24hr Vol: ${displayHumanFriendlyNumber(pair.volume.h24)}\n\n` +
-            `📈 <a href="${pair.url}">Chart</a>\n` +
+            `⏳ 24hr Vol: ${displayHumanFriendlyNumber(pair.volume.h24)}\n` +
+            `📈 <a href="${pair.url}">Chart</a>\n\n` +
             `       \`${pair.baseToken.address}\` (tap to copy)\n\n` +
             `${this.getWarnings(pair)}`
         );

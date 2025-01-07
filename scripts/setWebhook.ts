@@ -4,10 +4,10 @@ import {Bot} from "grammy";
 
 config();
 
-const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
+const botToken = getMandatoryEnvVariable("DEV_TELEGRAM_BOT_TOKEN");
 
 const bot = new Bot(botToken);
 
-bot.api.setWebhook(getMandatoryEnvVariable('TELEGRAM_WEBHOOK_URL'));
+bot.api.setWebhook(getMandatoryEnvVariable('DEV_TELEGRAM_WEBHOOK_URL'));
 
-bot.api.setMyCommands([{ command: 'start', description: '' }])
+bot.api.setMyCommands([{ command: 'start', description: 'See details about your wallet and other available commands' }])

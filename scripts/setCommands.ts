@@ -4,7 +4,7 @@ import {Bot} from "grammy";
 
 config();
 
-const botToken = getMandatoryEnvVariable("TELEGRAM_BOT_TOKEN");
+const botToken = getMandatoryEnvVariable("DEV_TELEGRAM_BOT_TOKEN");
 
 const bot = new Bot(botToken);
 
