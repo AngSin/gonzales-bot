@@ -26,11 +26,6 @@ const telegramCname = `${isDev ? 'dev-' : ''}telegram`;
 const ethTableName = `${isDev ? 'Dev' : ''}EthKeysTable`;
 const solTableName = `${isDev ? 'Dev' : ''}SolKeysTable`;
 
-const assetsCname = 'assets'
-const adminCname = 'admin';
-const actionsCname = 'actions';
-const apiCname = 'api';
-
 const certificateStack = new CertificateStack(app, `${isDev ? 'Dev' : ''}GonzalezCertificate`, {
     env: {
         ...env,
