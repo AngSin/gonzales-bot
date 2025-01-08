@@ -73,10 +73,10 @@ export class MessagingService {
             text: messageText,
             replyMarkup: inlineKeyboard,
             parseMode: "HTML",
-            replyTo: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
+            replyToMessageId: isReply ? (context.message || context.callbackQuery?.message)?.messageId : undefined,
             disableWebPagePreview: true,
         });
-        this.logger.info('Sending TG Message', { payload })
+        this.logger.info('Sending TG Message', { payload, context })
         await this.axios.post('sendMessage', payload);
     };
 }
