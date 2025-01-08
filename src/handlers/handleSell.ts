@@ -34,7 +34,7 @@ const handleSell = async (tokenMintAddress: string, userId: string, username: st
         userKey,
     });
     const messageText = `You sold ${sellPercentage}% of your ${ticker} holdings!`;
-    await messagingService.sendMessage(context, messageText);
+    await messagingService.sendMessage(context, messageText, undefined, true);
 };
 
 export default handleSell;

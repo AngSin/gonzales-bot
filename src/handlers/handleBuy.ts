@@ -38,7 +38,7 @@ const handleBuy = async (context: Camelized<Context>, assetAddress: string, user
         const purchase = await solanaService.tradeSolanaAsset({ assetAddress, amountInSmallestUnits: amountInLamports, userKey });
         if (purchase.success) {
             logger.info(`amount bought: ${purchase.amountBought} ${symbol}, chat is of type: ${context.callbackQuery?.message?.chat?.type}`);
-            await messagingService.sendMessage(context, `${context.callbackQuery?.from?.firstName} just bought some ${symbol}!`); // we do not want to reveal the purchased amount in a group chat
+            await messagingService.sendMessage(context, `${context.callbackQuery?.from?.firstName} just bought some ${symbol}!`, undefined, true); // we do not want to reveal the purchased amount in a group chat
         } else {
             await handlePurchaseError(purchase.error, context);
         }
