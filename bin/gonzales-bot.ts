@@ -21,7 +21,7 @@ const app = new cdk.App();
 
 const isDev = process.env.DEPLOYMENT_ENV === 'development';
 
-const telegramCname = `${isDev ? 'dev-' : ''}telegram`;
+const telegramCname = `${isDev ? 'dev-' : ''}${getMandatoryEnvVariable('TELEGRAM_C_NAME')}`;
 
 const ethTableName = `${isDev ? 'Dev' : ''}EthKeysTable`;
 const solTableName = `${isDev ? 'Dev' : ''}SolKeysTable`;

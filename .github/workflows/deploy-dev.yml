@@ -38,5 +38,6 @@ jobs:
           AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          TELEGRAM_C_NAME: ${{ secrets.TELEGRAM_C_NAME }}
           DEPLOYMENT_ENV: "development"
         run: make deploy
